@@ -28,8 +28,8 @@ def abundance_tpe():
     comp_subtype="Normal",
     depends_on={
         "real_tfec": 1,
-        "tpes_ej": 1,
         "total_real_nonenergy_use_consumption_ej": 1,
+        "tpes_ej": 1,
     },
 )
 def dynamic_quality_of_electricity():
@@ -186,17 +186,6 @@ def tpes_ej():
     Total Primary Energy Supply.
     """
     return total_extraction_nre_ej() + tpe_from_res_ej() + pes_waste()
-
-
-@component.add(
-    name="tpes_intensity_ej_tdollar",
-    units="EJ/(year*T$)",
-    comp_type="Auxiliary",
-    comp_subtype="Normal",
-    depends_on={"tpes_ej": 1, "gdp": 1},
-)
-def tpes_intensity_ej_tdollar():
-    return tpes_ej() / gdp()
 
 
 @component.add(

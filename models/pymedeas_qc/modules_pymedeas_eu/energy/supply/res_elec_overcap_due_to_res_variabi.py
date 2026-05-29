@@ -1,0 +1,202 @@
+"""
+Module energy.supply.res_elec_overcap_due_to_res_variabi
+Translated using PySD version 3.14.2
+"""
+
+@component.add(
+    name="Cp_exogenous_RES_elec_dispatch_reduction",
+    units="Dmnl",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"share_variable_res_elec_generation_vs_total_gen": 2},
+)
+def cp_exogenous_res_elec_dispatch_reduction():
+    """
+    Reduction of the capacity factor of the dispatchable plants as a function of the penetration of variables RES in the electricity generation (Source: NREL (2012), see MEDEAS D4.1).
+    """
+    return float(
+        np.minimum(
+            1,
+            -0.6209 * share_variable_res_elec_generation_vs_total_gen() ** 2
+            - 0.3998 * share_variable_res_elec_generation_vs_total_gen()
+            + 1.0222,
+        )
+    )
+
+
+@component.add(
+    name="Cp_exogenous_RES_elec_var_reduction",
+    units="Dmnl",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"share_variable_res_elec_generation_vs_total_gen": 1},
+)
+def cp_exogenous_res_elec_var_reduction():
+    """
+    Reduction of the capacity factor of the RES elec variables plants as a function of the penetration of variables RES in the electricity generation (Source: Delarue & Morris (2015), see MEDEAS D4.1).
+    """
+    return 1 / (
+        1
+        + 0.0001
+        * float(np.exp(9.85 * share_variable_res_elec_generation_vs_total_gen()))
+    )
+
+
+@component.add(
+    name="Elec_generation_dispatch_from_RES_TWh",
+    units="TWh/year",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"real_generation_res_elec_twh": 1, "fes_elec_from_biogas_twh": 1},
+)
+def elec_generation_dispatch_from_res_twh():
+    """
+    Base-load electricity generation from RES.
+    """
+    return (
+        sum(
+            real_generation_res_elec_twh()
+            .loc[_subscript_dict["RES_ELEC_DISPATCHABLE"]]
+            .rename({"RES_elec": "RES_ELEC_DISPATCHABLE!"}),
+            dim=["RES_ELEC_DISPATCHABLE!"],
+        )
+        + fes_elec_from_biogas_twh()
+    )
+
+
+@component.add(
+    name="Elec_generation_variable_from_RES_TWh",
+    units="TWh/year",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"real_generation_res_elec_twh": 1},
+)
+def elec_generation_variable_from_res_twh():
+    """
+    Variable electricity generation from RES.
+    """
+    return sum(
+        real_generation_res_elec_twh()
+        .loc[_subscript_dict["RES_ELEC_VARIABLE"]]
+        .rename({"RES_elec": "RES_ELEC_VARIABLE!"}),
+        dim=["RES_ELEC_VARIABLE!"],
+    )
+
+
+@component.add(
+    name="increase_variable_RES_share_elec_vs_total_generation",
+    units="Dmnl/year",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "share_variable_res_elec_generation_vs_total": 1,
+        "share_variable_res_elec_vs_total_generation_delayed_ts": 1,
+        "time_step": 1,
+    },
+)
+def increase_variable_res_share_elec_vs_total_generation():
+    return (
+        share_variable_res_elec_generation_vs_total()
+        - share_variable_res_elec_vs_total_generation_delayed_ts()
+    ) / time_step()
+
+
+@component.add(
+    name="initial_share_variable_RES_elec_gen_vs_total",
+    units="Dmnl",
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def initial_share_variable_res_elec_gen_vs_total():
+    """
+    Initial share of variable RES electricity in relation to the total generation.
+    """
+    return 0.0071
+
+
+@component.add(
+    name="Share_variable_RES_elec_generation_vs_total",
+    units="Dmnl",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "fe_elec_generation_from_nre_twh": 2,
+        "elec_generation_variable_from_res_twh": 3,
+        "elec_generation_dispatch_from_res_twh": 2,
+    },
+)
+def share_variable_res_elec_generation_vs_total():
+    """
+    Share of variable vs. total electricity generation. Condition to avoid error when the denominator is zero (0.5 is an arbitrary value).
+    """
+    return if_then_else(
+        fe_elec_generation_from_nre_twh()
+        + elec_generation_variable_from_res_twh()
+        + elec_generation_dispatch_from_res_twh()
+        > 0,
+        lambda: elec_generation_variable_from_res_twh()
+        / (
+            fe_elec_generation_from_nre_twh()
+            + elec_generation_variable_from_res_twh()
+            + elec_generation_dispatch_from_res_twh()
+        ),
+        lambda: 0.5,
+    )
+
+
+@component.add(
+    name="Share_variable_RES_elec_generation_vs_total_gen",
+    units="Dmnl",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_share_variable_res_elec_generation_vs_total_gen": 1},
+    other_deps={
+        "_integ_share_variable_res_elec_generation_vs_total_gen": {
+            "initial": {"initial_share_variable_res_elec_gen_vs_total": 1},
+            "step": {"increase_variable_res_share_elec_vs_total_generation": 1},
+        }
+    },
+)
+def share_variable_res_elec_generation_vs_total_gen():
+    """
+    Share variable RES electricity generation vs total electricity generation. Same variable as "share variable RES elec generation vs total" but introduced as stock in order to avoid simultaneous equations.
+    """
+    return _integ_share_variable_res_elec_generation_vs_total_gen()
+
+
+_integ_share_variable_res_elec_generation_vs_total_gen = Integ(
+    lambda: increase_variable_res_share_elec_vs_total_generation(),
+    lambda: initial_share_variable_res_elec_gen_vs_total(),
+    "_integ_share_variable_res_elec_generation_vs_total_gen",
+)
+
+
+@component.add(
+    name="Share_variable_RES_elec_vs_total_generation_delayed_TS",
+    units="Dmnl",
+    comp_type="Stateful",
+    comp_subtype="DelayFixed",
+    depends_on={
+        "_delayfixed_share_variable_res_elec_vs_total_generation_delayed_ts": 1
+    },
+    other_deps={
+        "_delayfixed_share_variable_res_elec_vs_total_generation_delayed_ts": {
+            "initial": {"time_step": 1},
+            "step": {"share_variable_res_elec_generation_vs_total": 1},
+        }
+    },
+)
+def share_variable_res_elec_vs_total_generation_delayed_ts():
+    """
+    "Share variable RES elec generation vs total" delayed 1 year.
+    """
+    return _delayfixed_share_variable_res_elec_vs_total_generation_delayed_ts()
+
+
+_delayfixed_share_variable_res_elec_vs_total_generation_delayed_ts = DelayFixed(
+    lambda: share_variable_res_elec_generation_vs_total(),
+    lambda: time_step(),
+    lambda: 0.0071,
+    time_step,
+    "_delayfixed_share_variable_res_elec_vs_total_generation_delayed_ts",
+)

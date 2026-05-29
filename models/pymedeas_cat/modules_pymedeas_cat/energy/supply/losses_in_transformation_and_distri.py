@@ -234,8 +234,8 @@ _ext_data_oil_refinery_share = ExtData(
     depends_on={
         "pes_total_oil_ej_cat": 1,
         "imports_cat_total_oil_from_row_ej": 1,
-        "imports_cat_coal_from_row_ej": 1,
         "extraction_coal_cat": 1,
+        "imports_cat_coal_from_row_ej": 1,
         "imports_cat_nat_gas_from_row_ej": 1,
         "pes_nat_gas_cat_": 1,
     },

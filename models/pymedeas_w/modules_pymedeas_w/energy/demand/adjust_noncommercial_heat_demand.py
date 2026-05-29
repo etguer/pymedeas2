@@ -29,13 +29,13 @@ _ext_constant_end_year_policy_share_feh_over_fed = ExtConstant(
     name='"FED_by_fuel_for_heat-nc"',
     units="EJ/year",
     subscripts=["final_sources"],
-    comp_type="Auxiliary, Constant",
+    comp_type="Constant, Auxiliary",
     comp_subtype="Normal",
     depends_on={
         "fed_oil_for_heatnc": 1,
         "fed_nat_gas_for_heatnc": 1,
-        "fed_solid_bioe_for_heatnc": 1,
         "fed_coal_for_heatnc": 1,
+        "fed_solid_bioe_for_heatnc": 1,
     },
 )
 def fed_by_fuel_for_heatnc():
@@ -60,8 +60,8 @@ def fed_by_fuel_for_heatnc():
     comp_subtype="Normal",
     depends_on={
         "required_fed_by_fuel_before_heat_correction": 1,
-        "share_feh_over_fed_by_final_fuel": 1,
         "hist_share_feh_over_fed_solid_bioe": 1,
+        "share_feh_over_fed_by_final_fuel": 1,
         "efficiency_coal_for_heat_plants": 1,
         "share_heat_distribution_losses": 1,
     },
@@ -172,13 +172,13 @@ def fed_solid_bioe_for_heatnc():
     name="hist_share_FEH_over_FED_by_final_fuel",
     units="Dmnl",
     subscripts=["final_sources"],
-    comp_type="Auxiliary, Constant",
+    comp_type="Constant, Auxiliary",
     comp_subtype="Normal",
     depends_on={
         "hist_share_feh_over_fed_oil": 1,
         "nist_share_feh_over_fed_nat_gas": 1,
-        "hist_share_feh_over_fed_solid_bioe": 1,
         "hist_share_feh_over_fed_coal": 1,
+        "hist_share_feh_over_fed_solid_bioe": 1,
     },
 )
 def hist_share_feh_over_fed_by_final_fuel():
@@ -303,7 +303,7 @@ _ext_constant_nist_share_feh_over_fed_nat_gas = ExtConstant(
     units="Dmnl",
     subscripts=["final_sources"],
     comp_type="Constant",
-    comp_subtype="External, Normal",
+    comp_subtype="Normal, External",
     depends_on={"__external__": "_ext_constant_policy_share_feh_over_fed"},
 )
 def policy_share_feh_over_fed():
@@ -427,10 +427,10 @@ def share_fed_liquids_vs_nre_heatnc():
     comp_type="Auxiliary",
     comp_subtype="Normal",
     depends_on={
-        "time": 6,
-        "end_year_policy_share_feh_over_fed": 4,
-        "policy_share_feh_over_fed": 4,
+        "time": 4,
         "hist_share_feh_over_fed_by_final_fuel": 6,
+        "policy_share_feh_over_fed": 2,
+        "end_year_policy_share_feh_over_fed": 2,
         "policy_share_feh_over_fed_bioe": 1,
     },
 )
@@ -441,31 +441,23 @@ def share_feh_over_fed_by_final_fuel():
     except_subs = xr.ones_like(value, dtype=bool)
     except_subs.loc[["solids"]] = False
     value.values[except_subs.values] = if_then_else(
-        time() > end_year_policy_share_feh_over_fed(),
-        lambda: policy_share_feh_over_fed(),
-        lambda: if_then_else(
-            time() < 2015,
-            lambda: hist_share_feh_over_fed_by_final_fuel(),
-            lambda: hist_share_feh_over_fed_by_final_fuel()
-            - (hist_share_feh_over_fed_by_final_fuel() - policy_share_feh_over_fed())
-            / (end_year_policy_share_feh_over_fed() - 2015)
-            * (time() - 2015),
-        ),
+        time() < 2015,
+        lambda: hist_share_feh_over_fed_by_final_fuel(),
+        lambda: hist_share_feh_over_fed_by_final_fuel()
+        - (hist_share_feh_over_fed_by_final_fuel() - policy_share_feh_over_fed())
+        / (end_year_policy_share_feh_over_fed() - 2015)
+        * (time() - 2015),
     ).values[except_subs.values]
     value.loc[["solids"]] = if_then_else(
-        time() > end_year_policy_share_feh_over_fed(),
-        lambda: float(policy_share_feh_over_fed().loc["solids"]),
-        lambda: if_then_else(
-            time() < 2015,
-            lambda: float(hist_share_feh_over_fed_by_final_fuel().loc["solids"]),
-            lambda: float(hist_share_feh_over_fed_by_final_fuel().loc["solids"])
-            - (
-                float(hist_share_feh_over_fed_by_final_fuel().loc["solids"])
-                - float(policy_share_feh_over_fed().loc["solids"])
-                - policy_share_feh_over_fed_bioe()
-            )
-            / (end_year_policy_share_feh_over_fed() - 2015)
-            * (time() - 2015),
-        ),
+        time() < 2015,
+        lambda: float(hist_share_feh_over_fed_by_final_fuel().loc["solids"]),
+        lambda: float(hist_share_feh_over_fed_by_final_fuel().loc["solids"])
+        - (
+            float(hist_share_feh_over_fed_by_final_fuel().loc["solids"])
+            - float(policy_share_feh_over_fed().loc["solids"])
+            - policy_share_feh_over_fed_bioe()
+        )
+        / (end_year_policy_share_feh_over_fed() - 2015)
+        * (time() - 2015),
     )
     return value

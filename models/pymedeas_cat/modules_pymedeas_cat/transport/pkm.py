@@ -521,9 +521,9 @@ _ext_lookup_mode_share_pkm = ExtLookup(
     comp_subtype="Normal",
     depends_on={
         "time": 3,
-        "pkmgdp_initial": 1,
-        "gdp_cat": 1,
         "pkmgdp_slope": 1,
+        "gdp_cat": 1,
+        "pkmgdp_initial": 1,
         "hist_pkm": 1,
     },
 )
@@ -633,8 +633,8 @@ def pkm_fuel_share_air():
         "time": 4,
         "end_historical_data": 3,
         "initial_fuel_share_households_pkm": 3,
-        "start_year_policies_transport": 3,
         "fuel_share_households_pkm": 2,
+        "start_year_policies_transport": 3,
     },
 )
 def pkm_fuel_share_households():
@@ -701,8 +701,8 @@ def pkm_fuel_share_inland():
         "time": 4,
         "end_historical_data": 3,
         "initial_fuel_share_maritime_pkm": 3,
-        "start_year_policies_transport": 3,
         "fuel_share_maritime_pkm": 2,
+        "start_year_policies_transport": 3,
     },
 )
 def pkm_fuel_share_maritime():
@@ -735,8 +735,8 @@ def pkm_fuel_share_maritime():
         "time": 5,
         "end_historical_data": 5,
         "hist_transport_share_pkm": 3,
-        "start_year_policies_transport": 3,
         "mode_share_pkm": 2,
+        "start_year_policies_transport": 3,
     },
 )
 def pkm_mode_share():

@@ -169,8 +169,8 @@ _sampleiftrue_historic_share_conv_nat_gas_domestic_cat_extraction_until_2016 = (
             },
             "step": {
                 "time": 1,
-                "extraction_nat_gas_ej_world": 1,
                 "historic_net_imports_nat_gas_cat_": 1,
+                "extraction_nat_gas_ej_world": 1,
             },
         }
     },
@@ -305,6 +305,30 @@ def imports_cat_unconv_gas_from_row():
 
 
 @component.add(
+    name="nat_gas_for_non_energy",
+    units="EJ/year",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"nonenergy_use_demand_by_final_fuel": 1, "share_ff_fs": 1},
+)
+def nat_gas_for_non_energy():
+    return float(nonenergy_use_demand_by_final_fuel().loc["gases"]) * float(
+        share_ff_fs().loc["gases"]
+    )
+
+
+@component.add(
+    name="nat_gas_TFC",
+    units="EJ/year",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"ped_nat_gas_ej": 1, "share_nat_gas_for_fc_emissions_relevant": 1},
+)
+def nat_gas_tfc():
+    return ped_nat_gas_ej() * share_nat_gas_for_fc_emissions_relevant()
+
+
+@component.add(
     name="Other_gases_required",
     units="EJ/year",
     comp_type="Auxiliary",
@@ -428,13 +452,34 @@ def ped_gases():
     units="EJ/year",
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"ped_gases": 1, "pes_biogas_ej": 1},
+    depends_on={
+        "ped_gas_elec_plants_ej": 1,
+        "ped_gas_for_chp_plants_ej": 1,
+        "ped_gases_for_heat_plants_ej": 1,
+        "synthethic_fuel_generation_delayed": 1,
+        "pes_biogas_ej": 1,
+        "ped_gases": 1,
+    },
 )
 def ped_nat_gas_ej():
     """
     Primary energy demand of natural (fossil) gas.
     """
-    return float(np.maximum(0, ped_gases() - pes_biogas_ej()))
+    return float(
+        np.maximum(
+            ped_gas_elec_plants_ej()
+            + ped_gas_for_chp_plants_ej()
+            + ped_gases_for_heat_plants_ej(),
+            ped_gases()
+            - pes_biogas_ej()
+            - sum(
+                synthethic_fuel_generation_delayed()
+                .loc[_subscript_dict["ETG"]]
+                .rename({"E_to_synthetic": "ETG!"}),
+                dim=["ETG!"],
+            ),
+        )
+    )
 
 
 @component.add(
@@ -442,13 +487,26 @@ def ped_nat_gas_ej():
     units="EJ/year",
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"pec_nat_gas": 1, "pes_biogas_ej": 1},
+    depends_on={
+        "pec_nat_gas": 1,
+        "pes_biogas_ej": 1,
+        "synthethic_fuel_generation_delayed": 1,
+    },
 )
 def pes_gases():
     """
     Primary energy supply gas.
     """
-    return pec_nat_gas() + pes_biogas_ej()
+    return (
+        pec_nat_gas()
+        + pes_biogas_ej()
+        + sum(
+            synthethic_fuel_generation_delayed()
+            .loc[_subscript_dict["ETG"]]
+            .rename({"E_to_synthetic": "ETG!"}),
+            dim=["ETG!"],
+        )
+    )
 
 
 @component.add(
@@ -498,6 +556,33 @@ def share_biogas_in_pes():
 
 
 @component.add(
+    name="share_FF_FS",
+    units="1",
+    subscripts=["matter_final_sources"],
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "ped_nat_gas_ej": 1,
+        "ped_gases": 1,
+        "ped_total_oil_ej": 1,
+        "ped_liquids": 1,
+        "ped_coal_ej": 1,
+        "ped_solids": 1,
+    },
+)
+def share_ff_fs():
+    value = xr.DataArray(
+        np.nan,
+        {"matter_final_sources": _subscript_dict["matter_final_sources"]},
+        ["matter_final_sources"],
+    )
+    value.loc[["gases"]] = zidz(ped_nat_gas_ej(), ped_gases())
+    value.loc[["liquids"]] = zidz(ped_total_oil_ej(), ped_liquids())
+    value.loc[["solids"]] = zidz(ped_coal_ej(), ped_solids())
+    return value
+
+
+@component.add(
     name="share_gas_elec_plants",
     units="Dmnl",
     comp_type="Auxiliary",
@@ -530,8 +615,8 @@ def share_gases_dem_for_heatnc():
     depends_on={
         "required_fed_by_gases": 1,
         "ped_nat_gas_for_gtl_ej": 1,
-        "ped_gases": 1,
         "other_gases_required": 1,
+        "ped_gases": 1,
     },
 )
 def share_gases_for_final_energy():
@@ -608,20 +693,19 @@ def share_nat_gas_for_elec_emissions_relevant():
     comp_type="Auxiliary",
     comp_subtype="Normal",
     depends_on={
-        "nonenergy_use_demand_by_final_fuel": 1,
-        "ped_gases": 1,
         "share_nat_gas_for_elec_emissions_relevant": 1,
         "share_nat_gas_for_gtl_emissions_relevant": 1,
         "share_nat_gas_for_heat_emissions_relevant": 1,
     },
 )
 def share_nat_gas_for_fc_emissions_relevant():
-    return (
-        1
-        - zidz(float(nonenergy_use_demand_by_final_fuel().loc["gases"]), ped_gases())
-        - share_nat_gas_for_elec_emissions_relevant()
-        - share_nat_gas_for_gtl_emissions_relevant()
-        - share_nat_gas_for_heat_emissions_relevant()
+    """
+    (1-(ZIDZ("Non-energy_use_demand_by_final_fuel"[gases]*share_FF_FS[gases],PED_gases)+s hare_nat_gas_for_Elec_emissions_relevant +share_nat_gas_for_GTL_emissions_relevant +share_nat_gas_for_Heat_emissions_relevant))
+    """
+    return 1 - (
+        share_nat_gas_for_elec_emissions_relevant()
+        + share_nat_gas_for_gtl_emissions_relevant()
+        + share_nat_gas_for_heat_emissions_relevant()
     )
 
 
@@ -630,10 +714,12 @@ def share_nat_gas_for_fc_emissions_relevant():
     units="Dmnl",
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"ped_nat_gas_for_gtl_ej": 1, "ped_nat_gas_ej": 1},
+    depends_on={"ped_nat_gas_for_gtl_ej": 1, "ped_nat_gas_ej": 1, "share_ff_fs": 1},
 )
 def share_nat_gas_for_gtl_emissions_relevant():
-    return zidz(ped_nat_gas_for_gtl_ej(), ped_nat_gas_ej())
+    return zidz(ped_nat_gas_for_gtl_ej(), ped_nat_gas_ej()) * float(
+        share_ff_fs().loc["gases"]
+    )
 
 
 @component.add(

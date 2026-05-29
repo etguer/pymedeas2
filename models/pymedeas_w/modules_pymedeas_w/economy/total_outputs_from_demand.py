@@ -77,8 +77,8 @@ def dollars_to_tdollars():
     comp_subtype="Normal",
     depends_on={
         "activate_energy_scarcity_feedback": 1,
+        "real_fec_before_heat_dem_corr": 1,
         "required_fed_by_fuel_before_heat_correction": 1,
-        "real_fe_consumption_by_fuel_before_heat_correction": 1,
     },
 )
 def energy_scarcity_feedback_shortage_coeff():
@@ -90,7 +90,7 @@ def energy_scarcity_feedback_shortage_coeff():
         lambda: np.minimum(
             1,
             zidz(
-                real_fe_consumption_by_fuel_before_heat_correction(),
+                real_fec_before_heat_dem_corr(),
                 required_fed_by_fuel_before_heat_correction(),
             ),
         ),
@@ -246,24 +246,24 @@ _delayfixed_real_demand_by_sector_delayed = DelayFixed(
     depends_on={
         "total_fe_elec_consumption_twh": 1,
         "ej_per_twh": 1,
-        "share_heat_distribution_losses": 1,
         "total_fe_heat_generation": 1,
-        "pes_gases": 1,
-        "share_gases_for_final_energy": 1,
+        "share_heat_distribution_losses": 1,
         "other_gases_required": 1,
         "ped_nat_gas_for_gtl_ej": 1,
+        "share_gases_for_final_energy": 1,
+        "pes_gases": 1,
         "share_liquids_for_final_energy": 1,
-        "pes_liquids": 1,
+        "pes_liquids_ej": 1,
         "other_liquids_required_ej": 1,
-        "pe_traditional_biomass_ej_delayed": 1,
-        "solid_bioe_supply": 1,
-        "ped_coal_for_ctl_ej": 1,
+        "other_solids_required": 1,
+        "share_solids_for_final_energy": 1,
         "pes_waste_for_tfc": 1,
         "losses_in_charcoal_plants_historic": 1,
+        "ped_coal_for_ctl_ej": 1,
+        "solid_bioe_supply": 1,
+        "pe_traditional_biomass_ej_delayed": 1,
         "extraction_coal_ej": 1,
-        "other_solids_required": 1,
         "pes_peat": 1,
-        "share_solids_for_final_energy": 1,
     },
 )
 def real_fe_consumption_by_fuel():
@@ -282,23 +282,28 @@ def real_fe_consumption_by_fuel():
     ) * share_gases_for_final_energy()
     value.loc[["liquids"]] = float(
         np.maximum(
-            (pes_liquids() - other_liquids_required_ej())
+            (pes_liquids_ej() - other_liquids_required_ej())
             * share_liquids_for_final_energy(),
             0,
         )
     )
     value.loc[["solids"]] = (
         extraction_coal_ej()
-        + (pe_traditional_biomass_ej_delayed() + pes_peat() + solid_bioe_supply())
-        - losses_in_charcoal_plants_historic()
+        + (
+            pe_traditional_biomass_ej_delayed()
+            + pes_waste_for_tfc()
+            + pes_peat()
+            + solid_bioe_supply()
+            + losses_in_charcoal_plants_historic()
+        )
         - ped_coal_for_ctl_ej()
         - other_solids_required()
-    ) * share_solids_for_final_energy() + pes_waste_for_tfc()
+    ) * share_solids_for_final_energy()
     return value
 
 
 @component.add(
-    name="real_FE_consumption_by_fuel_before_heat_correction",
+    name="Real_FEC_before_heat_dem_corr",
     units="EJ/year",
     subscripts=["final_sources"],
     comp_type="Auxiliary",
@@ -309,7 +314,7 @@ def real_fe_consumption_by_fuel():
         "share_feh_over_fed_by_final_fuel": 3,
     },
 )
-def real_fe_consumption_by_fuel_before_heat_correction():
+def real_fec_before_heat_dem_corr():
     value = xr.DataArray(
         np.nan, {"final_sources": _subscript_dict["final_sources"]}, ["final_sources"]
     )
@@ -416,22 +421,6 @@ def real_tfec():
 
 
 @component.add(
-    name="real_TFEC_before_heat_corr",
-    units="EJ/year",
-    comp_type="Auxiliary",
-    comp_subtype="Normal",
-    depends_on={"real_fe_consumption_by_fuel_before_heat_correction": 1},
-)
-def real_tfec_before_heat_corr():
-    return sum(
-        real_fe_consumption_by_fuel_before_heat_correction().rename(
-            {"final_sources": "final_sources!"}
-        ),
-        dim=["final_sources!"],
-    )
-
-
-@component.add(
     name="Real_total_output",
     units="Mdollars",
     comp_type="Auxiliary",
@@ -457,8 +446,8 @@ def real_total_output():
         "real_final_energy_by_sector_and_fuel": 1,
         "nvs_1_year": 1,
         "final_energy_intensity_by_sector_and_fuel": 1,
-        "m_to_t": 2,
         "required_total_output_by_sector": 1,
+        "m_to_t": 2,
     },
 )
 def real_total_output_by_fuel_and_sector():
@@ -617,9 +606,9 @@ def required_fed_sectors_by_fuel():
         "final_energy_intensity_by_sector_and_fuel": 3,
         "m_to_t": 3,
         "nvs_1_year": 3,
-        "ccs_energy_demand_sect": 1,
-        "dac_energy_demand_per_sector_and_fuel": 2,
         "ej_per_twh": 3,
+        "dac_energy_demand_per_sector_and_fuel": 2,
+        "ccs_energy_demand_sect": 1,
     },
 )
 def required_final_energy_by_sector_and_fuel():
@@ -709,23 +698,6 @@ def required_total_output_by_sector():
 
 
 @component.add(
-    name="share_electricity_TFEC",
-    units="1",
-    comp_type="Auxiliary",
-    comp_subtype="Normal",
-    depends_on={"real_fe_consumption_by_fuel": 1, "real_tfec_before_heat_corr": 1},
-)
-def share_electricity_tfec():
-    """
-    Share of electricity in TFEC
-    """
-    return (
-        float(real_fe_consumption_by_fuel().loc["electricity"])
-        / real_tfec_before_heat_corr()
-    )
-
-
-@component.add(
     name="share_FED_by_sector",
     units="1",
     subscripts=["SECTORS_and_HOUSEHOLDS"],
@@ -771,21 +743,5 @@ def tfei_sectors():
 def total_fed():
     return sum(
         required_fed_by_fuel().rename({"final_sources": "final_sources!"}),
-        dim=["final_sources!"],
-    )
-
-
-@component.add(
-    name="total_FED_before_heat_corr",
-    units="EJ/year",
-    comp_type="Auxiliary",
-    comp_subtype="Normal",
-    depends_on={"required_fed_by_fuel_before_heat_correction": 1},
-)
-def total_fed_before_heat_corr():
-    return sum(
-        required_fed_by_fuel_before_heat_correction().rename(
-            {"final_sources": "final_sources!"}
-        ),
         dim=["final_sources!"],
     )

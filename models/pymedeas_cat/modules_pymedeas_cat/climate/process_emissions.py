@@ -153,6 +153,9 @@ _ext_constant_target_year_process_emissions_improvement = ExtConstant(
     },
 )
 def total_process_emissions():
+    """
+    Total yearly process emissions
+    """
     return (
         float(
             total_output_required_by_sector().loc[

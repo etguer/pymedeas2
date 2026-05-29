@@ -16,7 +16,7 @@ def a_lin_reg_nonenergy():
     )
     value.loc[["electricity"]] = 0
     value.loc[["heat"]] = 0
-    value.loc[["liquids"]] = -0.461414
+    value.loc[["liquids"]] = 0.461414
     value.loc[["gases"]] = 0.123925
     value.loc[["solids"]] = 0.0797511
     return value
@@ -158,16 +158,17 @@ def total_real_nonenergy_use_consumption_ej():
     comp_subtype="Normal",
     depends_on={
         "nonenergy_use_demand_by_final_fuel": 1,
-        "nvs_1_year": 1,
         "a_lin_reg_nonenergy": 1,
-        "gdp_delayed_1yr": 1,
+        "nvs_1_year": 1,
         "gdp_cat": 1,
+        "gdp_delayed_1yr": 1,
     },
 )
 def variation_nonenergy_use():
     return if_then_else(
         nonenergy_use_demand_by_final_fuel() > 0.01,
-        lambda: a_lin_reg_nonenergy() * (gdp_cat() - gdp_delayed_1yr()) / nvs_1_year(),
+        lambda: a_lin_reg_nonenergy() * (gdp_cat() - gdp_delayed_1yr()) / nvs_1_year()
+        - 0.0017,
         lambda: xr.DataArray(
             0, {"final_sources": _subscript_dict["final_sources"]}, ["final_sources"]
         ),

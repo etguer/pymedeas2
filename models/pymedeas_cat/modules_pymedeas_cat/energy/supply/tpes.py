@@ -22,6 +22,23 @@ def abundance_tpe():
 
 
 @component.add(
+    name="FEC_over_TPES",
+    units="1",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"real_fec_before_heat_dem_corr": 1, "tpes_ej": 1},
+)
+def fec_over_tpes():
+    return (
+        sum(
+            real_fec_before_heat_dem_corr().rename({"final_sources": "final_sources!"}),
+            dim=["final_sources!"],
+        )
+        / tpes_ej()
+    )
+
+
+@component.add(
     name='"g=quality_of_electricity"',
     units="Dmnl",
     comp_type="Auxiliary",
@@ -103,8 +120,8 @@ def share_imports_cat_nre_vs_tpec():
     comp_subtype="Normal",
     depends_on={
         "real_tfec": 1,
-        "total_real_nonenergy_use_consumption_ej": 1,
         "tpes_ej": 1,
+        "total_real_nonenergy_use_consumption_ej": 1,
     },
 )
 def share_total_final_energy_vs_tpes():
@@ -240,6 +257,17 @@ def tpes_ej():
     Total Primary Energy Supply.
     """
     return total_consumption_nre_ej() + tpe_from_res_ej() + pes_waste()
+
+
+@component.add(
+    name="TPES_intensity",
+    units="EJ/(year*T$)",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"tpes_ej": 1, "gdp_cat": 1},
+)
+def tpes_intensity():
+    return tpes_ej() / gdp_cat()
 
 
 @component.add(

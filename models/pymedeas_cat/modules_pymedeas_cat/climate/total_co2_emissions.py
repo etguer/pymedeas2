@@ -292,8 +292,8 @@ def co2_emissions_fossil_fuels():
         "pec_nat_gas": 4,
         "share_nat_gas_for_elec_emissions_relevant": 1,
         "share_nat_gas_for_heat_emissions_relevant": 1,
-        "gtco2_per_ej_gtl": 1,
         "share_nat_gas_for_gtl_emissions_relevant": 1,
+        "gtco2_per_ej_gtl": 1,
         "share_nat_gas_for_fc_emissions_relevant": 1,
     },
 )
@@ -644,9 +644,9 @@ _ext_constant_gtco2_per_ej_gtl = ExtConstant(
     depends_on={
         "share_conv_vs_total_oil_extraction": 2,
         "gtco2_per_ej_conv_oil": 1,
-        "adapt_emissions_shale_oil": 1,
         "gtco2_per_ej_shale_oil": 1,
         "gtco2_per_ej_unconv_oil": 2,
+        "adapt_emissions_shale_oil": 1,
     },
 )
 def gtco2_per_ej_oil():
@@ -776,14 +776,41 @@ _ext_constant_gtco2_per_ej_unconv_oil = ExtConstant(
 @component.add(
     name="GtCO2_per_EJ_waste",
     units="GtCO2/EJ",
-    comp_type="Constant",
+    comp_type="Auxiliary",
     comp_subtype="Normal",
+    depends_on={"time": 2, "historic_gtco2_per_ej_waste": 3},
 )
 def gtco2_per_ej_waste():
     """
-    GET DIRECT CONSTANTS('../climate.xlsx', 'Global', 'co2_waste')
+    0
     """
-    return 0
+    return if_then_else(
+        time() < 2015,
+        lambda: historic_gtco2_per_ej_waste(),
+        lambda: historic_gtco2_per_ej_waste()
+        - historic_gtco2_per_ej_waste() / (2050 - 2015) * (time() - 2015),
+    )
+
+
+@component.add(
+    name="historic_GtCO2_per_EJ_waste",
+    comp_type="Constant",
+    comp_subtype="External",
+    depends_on={"__external__": "_ext_constant_historic_gtco2_per_ej_waste"},
+)
+def historic_gtco2_per_ej_waste():
+    return _ext_constant_historic_gtco2_per_ej_waste()
+
+
+_ext_constant_historic_gtco2_per_ej_waste = ExtConstant(
+    r"../climate.xlsx",
+    "Global",
+    "co2_waste",
+    {},
+    _root,
+    {},
+    "_ext_constant_historic_gtco2_per_ej_waste",
+)
 
 
 @component.add(

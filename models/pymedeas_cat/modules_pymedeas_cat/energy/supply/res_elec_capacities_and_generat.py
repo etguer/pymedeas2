@@ -172,14 +172,14 @@ _ext_constant_end_hist_data = ExtConstant(
     comp_subtype="Normal",
     depends_on={
         "total_fe_elec_demand_after_priorities": 1,
-        "potential_tot_generation_res_elec_twh": 1,
+        "potential_tot_generation_after_curtailment_res_elec_twh": 1,
     },
 )
 def fe_real_tot_generation_res_elec():
     return float(
         np.minimum(
             float(np.maximum(total_fe_elec_demand_after_priorities(), 0)),
-            potential_tot_generation_res_elec_twh(),
+            potential_tot_generation_after_curtailment_res_elec_twh(),
         )
     )
 
@@ -347,8 +347,8 @@ _ext_constant_min_cp_baseload_res = ExtConstant(
     comp_subtype="Normal",
     depends_on={
         "time": 1,
-        "installed_capacity_res_elec": 1,
         "res_installed_capacity_year_delayed": 1,
+        "installed_capacity_res_elec": 1,
         "nvs_1_year": 1,
     },
 )
@@ -431,6 +431,23 @@ def potential_res_elec_after_intermitt_twh():
     Potential of RES for electricity per technology after accounting for the reduction of the maximal potential given the reduction of the Cp.
     """
     return max_res_elec_twe() * cp_baseload_reduction() / twe_per_twh()
+
+
+@component.add(
+    name="potential_tot_generation_after_curtailment_RES_elec_TWh",
+    units="TWh/year",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "potential_tot_generation_res_elec_twh": 1,
+        "curtailment_and_storage_share_variable_res": 1,
+        "time": 1,
+    },
+)
+def potential_tot_generation_after_curtailment_res_elec_twh():
+    return potential_tot_generation_res_elec_twh() * (
+        1 - curtailment_and_storage_share_variable_res(time())
+    )
 
 
 @component.add(
@@ -637,7 +654,7 @@ _integ_res_elec_planned_capacity_tw = Integ(
     comp_type="Auxiliary",
     comp_subtype="Normal",
     depends_on={
-        "potential_tot_generation_res_elec_twh": 1,
+        "potential_tot_generation_after_curtailment_res_elec_twh": 1,
         "fe_real_tot_generation_res_elec": 1,
     },
 )
@@ -646,7 +663,10 @@ def res_elec_tot_overcapacity():
     Overcapacity for each technology RES for electricity taking into account the installed capacity and the real generation.
     """
     return (
-        zidz(potential_tot_generation_res_elec_twh(), fe_real_tot_generation_res_elec())
+        zidz(
+            potential_tot_generation_after_curtailment_res_elec_twh(),
+            fe_real_tot_generation_res_elec(),
+        )
         - 1
     )
 
@@ -794,7 +814,7 @@ def total_time_planconstr_res_elec():
     subscripts=["RES_elec"],
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"time": 1, "replaced_capacity_res_elec_tw": 1, "lifetime_res_elec": 1},
+    depends_on={"time": 1, "lifetime_res_elec": 1, "replaced_capacity_res_elec_tw": 1},
 )
 def wear_res_elec():
     """

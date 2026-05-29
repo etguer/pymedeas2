@@ -181,9 +181,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_air_transport",
+    "ccs_tech_share_mqes",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Air_Transport"],
+        "SECTORS_and_HOUSEHOLDS": ["Mining_quarrying_and_energy_supply"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -192,9 +192,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_chemical_and_petrochemical",
+    "ccs_tech_share_fbt",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Chemical_and_Petrochemical"],
+        "SECTORS_and_HOUSEHOLDS": ["Food_Beverages_and_Tobacco"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -203,9 +203,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_coal_and_peat_mining",
+    "ccs_tech_share_tex",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Coal_and_Peat_Mining"],
+        "SECTORS_and_HOUSEHOLDS": ["Textiles_and_leather_etc"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -214,9 +214,11 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_coke_oven_products",
+    "ccs_tech_share_coke",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Coke_Oven_Products"],
+        "SECTORS_and_HOUSEHOLDS": [
+            "Coke_refined_petroleum_nuclear_fuel_and_chemicals_etc"
+        ],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -225,9 +227,11 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_commercial_and_public_services",
+    "ccs_tech_share_eoete",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Commercial_and_Public_Services"],
+        "SECTORS_and_HOUSEHOLDS": [
+            "Electrical_and_optical_equipment_and_Transport_equipment"
+        ],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -236,7 +240,18 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_construction",
+    "ccs_tech_share_om",
+    {
+        "SECTORS_and_HOUSEHOLDS": ["Other_manufacturing"],
+        "CCS_tech": _subscript_dict["CCS_tech"],
+    },
+)
+
+_ext_lookup_ccs_tech_share.add(
+    r"../climate.xlsx",
+    "World",
+    "year_ccs_tech",
+    "ccs_tech_share_cons",
     {
         "SECTORS_and_HOUSEHOLDS": ["Construction"],
         "CCS_tech": _subscript_dict["CCS_tech"],
@@ -247,9 +262,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_electricity_and_heat_generation",
+    "ccs_tech_share_dist",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Electricity_and_Heat_Generation"],
+        "SECTORS_and_HOUSEHOLDS": ["Distribution"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -258,17 +273,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_fishing",
-    {"SECTORS_and_HOUSEHOLDS": ["Fishing"], "CCS_tech": _subscript_dict["CCS_tech"]},
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_food_and_tobacco",
+    "ccs_tech_share_hr",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Food_and_Tobacco"],
+        "SECTORS_and_HOUSEHOLDS": ["Hotels_and_restaurant"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -277,9 +284,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_iron_and_steel",
+    "ccs_tech_share_tsc",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Iron_and_Steel"],
+        "SECTORS_and_HOUSEHOLDS": ["Transport_storage_and_communication"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -288,9 +295,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_land_transport",
+    "ccs_tech_share_fi",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Land_Transport"],
+        "SECTORS_and_HOUSEHOLDS": ["Financial_Intermediation"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -299,9 +306,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_liquefaction_and_regasification_plants",
+    "ccs_tech_share_re",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Liquefaction_and_Regasification_Plants"],
+        "SECTORS_and_HOUSEHOLDS": ["Real_estate_renting_and_busine_activitie"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -310,149 +317,9 @@ _ext_lookup_ccs_tech_share.add(
     r"../climate.xlsx",
     "World",
     "year_ccs_tech",
-    "ccs_tech_share_machinery",
-    {"SECTORS_and_HOUSEHOLDS": ["Machinery"], "CCS_tech": _subscript_dict["CCS_tech"]},
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_mining_and_quarrying",
+    "ccs_tech_share_nms",
     {
-        "SECTORS_and_HOUSEHOLDS": ["Mining_and_Quarrying"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_non_ferrous_metals",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Non_Ferrous_Metals"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_non_metallic_minerals",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Non_Metallic_Minerals"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_nuclear_industry",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Nuclear_Industry"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_oil_refineries",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Oil_Refineries"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_oil_and_gas_extraction",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Oil_and_Gas_Extraction"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_other_industry",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Other_Industry"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_paper_pulp_and_print",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Paper_Pulp_and_Print"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_pipeline_transport",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Pipeline_Transport"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_textile_and_leather",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Textile_and_Leather"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_transport_equipment",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Transport_Equipment"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_water_transport",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Water_Transport"],
-        "CCS_tech": _subscript_dict["CCS_tech"],
-    },
-)
-
-_ext_lookup_ccs_tech_share.add(
-    r"../climate.xlsx",
-    "World",
-    "year_ccs_tech",
-    "ccs_tech_share_wood_and_wood_products",
-    {
-        "SECTORS_and_HOUSEHOLDS": ["Wood_and_Wood_Products"],
+        "SECTORS_and_HOUSEHOLDS": ["Non_Market_Service"],
         "CCS_tech": _subscript_dict["CCS_tech"],
     },
 )
@@ -466,8 +333,8 @@ _ext_lookup_ccs_tech_share.add(
     comp_subtype="Normal",
     depends_on={
         "co2_policy_captured_sector_ccs": 2,
-        "share_ccs_energy_related": 2,
         "time": 4,
+        "share_ccs_energy_related": 2,
         "share_beccs": 2,
         "co2_emissions_households_and_sectors_fossil_fuels": 2,
         "co2_emissions_per_fuel": 2,
@@ -480,23 +347,27 @@ def co2_captured_by_sector_energy_related():
         ["SECTORS_and_HOUSEHOLDS"],
     )
     except_subs = xr.ones_like(value, dtype=bool)
-    except_subs.loc[["Electricity_and_Heat_Generation"]] = False
+    except_subs.loc[["Mining_quarrying_and_energy_supply"]] = False
     value.values[except_subs.values] = np.minimum(
         co2_policy_captured_sector_ccs() * share_ccs_energy_related(time()),
         co2_emissions_households_and_sectors_fossil_fuels() * (1 + share_beccs(time())),
     ).values[except_subs.values]
-    value.loc[["Electricity_and_Heat_Generation"]] = float(
+    value.loc[["Mining_quarrying_and_energy_supply"]] = float(
         np.minimum(
             float(
-                co2_policy_captured_sector_ccs().loc["Electricity_and_Heat_Generation"]
+                co2_policy_captured_sector_ccs().loc[
+                    "Mining_quarrying_and_energy_supply"
+                ]
             )
             * float(
-                share_ccs_energy_related(time()).loc["Electricity_and_Heat_Generation"]
+                share_ccs_energy_related(time()).loc[
+                    "Mining_quarrying_and_energy_supply"
+                ]
             ),
             (
                 float(
                     co2_emissions_households_and_sectors_fossil_fuels().loc[
-                        "Electricity_and_Heat_Generation"
+                        "Mining_quarrying_and_energy_supply"
                     ]
                 )
                 + float(co2_emissions_per_fuel().loc["electricity"])
@@ -774,8 +645,8 @@ def overcapacity_ccs_process():
     comp_subtype="Normal",
     depends_on={
         "co2_policy_captured_sector_ccs": 1,
-        "share_ccs_energy_related": 1,
         "time": 1,
+        "share_ccs_energy_related": 1,
     },
 )
 def process_co2_captured_ccs():
@@ -1068,20 +939,4 @@ def total_dac_energy_demand():
             }
         ),
         dim=["dac_final_sources!", "SECTORS_and_HOUSEHOLDS!"],
-    )
-
-
-@component.add(
-    name="Total_process_emissions_captured",
-    units="GTCO2e/year",
-    comp_type="Auxiliary",
-    comp_subtype="Normal",
-    depends_on={"process_co2_captured_ccs": 1},
-)
-def total_process_emissions_captured():
-    return sum(
-        process_co2_captured_ccs().rename(
-            {"SECTORS_and_HOUSEHOLDS": "SECTORS_and_HOUSEHOLDS!"}
-        ),
-        dim=["SECTORS_and_HOUSEHOLDS!"],
     )
