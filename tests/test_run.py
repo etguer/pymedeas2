@@ -142,7 +142,7 @@ def select_model(tmp_dir, proj_folder, model, default_vars):
                 "models/pymedeas_qc/pymedeas_qc.py"),
             subscripts_file="_subscripts_pymedeas_qc.json",
             scenario_file="scen_qc.xlsx",
-            inputs_sheet="Quebec",
+            inputs_sheet="Europe",
             out_folder=tmp_dir,
             out_default=default_vars[config.aggregation][model],
             parent=[
