@@ -104,10 +104,10 @@
       "parent": []
     },
     "pymedeas_qc": {
-      "model_file": "models/pymedeas_qc/pymedeas_eu.py",
-      "subscripts_file": "_subscripts_pymedeas_eu.json",
+      "model_file": "models/pymedeas_qc/pymedeas_qc.py",
+      "subscripts_file": "_subscripts_pymedeas_qc.json",
       "scenario_file": "scen_qc.xlsx",
-      "inputs_sheet": "Europe",
+      "inputs_sheet": "Quebec",
       "out_default": [
         "gdp_eu",
         "total_fe_elec_generation_twh_eu",
@@ -119,7 +119,7 @@
       "parent": [
         {
           "name": "pymedeas_w",
-          "default_results_folder": "outputs/14sectors_cat/pymedeas_w"
+          "default_results_folder": "outputs/16sectors_qc/pymedeas_w"
         }
       ]
     }

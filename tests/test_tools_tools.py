@@ -15,10 +15,13 @@ all_regions = [
     ("14sectors_cat", "pymedeas_w"),
     ("14sectors_cat", "pymedeas_eu"),
     ("14sectors_cat", "pymedeas_cat"),
+    ("16sectors_qc", "pymedeas_w"),
+    ("16sectors_qc", "pymedeas_qc")
 ]
 sub_regions = [
     ("14sectors_cat", "pymedeas_eu"),
     ("14sectors_cat", "pymedeas_cat"),
+    ("16sectors_qc", "pymedeas_qc")
 ]
 
 

@@ -1,5 +1,5 @@
 """
-Python model 'pymedeas_eu.py'
+Python model 'pymedeas_qc.py'
 Translated using PySD
 """
 
@@ -28,7 +28,7 @@ __data = {"scope": None, "time": lambda: 0}
 
 _root = Path(__file__).parent
 
-_subscript_dict, _modules = load_model_data(_root, "pymedeas_eu")
+_subscript_dict, _modules = load_model_data(_root, "pymedeas_qc")
 
 component = Component()
 
@@ -109,5 +109,5 @@ def time_step():
 #                           MODEL VARIABLES                           #
 #######################################################################
 
-# load modules from modules_pymedeas_eu directory
-exec(load_modules("modules_pymedeas_eu", _modules, _root, []))
+# load modules from modules_pymedeas_qc directory
+exec(load_modules("modules_pymedeas_qc", _modules, _root, []))

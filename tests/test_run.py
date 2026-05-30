@@ -109,10 +109,50 @@ def select_model(tmp_dir, proj_folder, model, default_vars):
                     name="pymedeas_eu",
                     default_results_folder=tmp_dir,
                     results_file_path=tmp_dir.joinpath("14eu.nc"),
+
                 ),
             ],
         )
-
+    if model == "16pymedeas_w":
+        model = "pymedeas_w"
+        config.aggregation = "16sectors_qc"
+        config.model_arguments.results_fname = "16w.csv"
+        config.model_arguments.results_fpath =\
+            tmp_dir.joinpath(config.model_arguments.results_fname)
+        config.region = model
+        config.model = Model(
+            model_file=proj_folder.joinpath(
+                "models/pymedeas_w/pymedeas_w.py"),
+            subscripts_file="_subscripts_pymedeas_w.json",
+            scenario_file="scen_w.xlsx",
+            inputs_sheet="World",
+            out_folder=tmp_dir,
+            out_default=default_vars[config.aggregation][model],
+            parent=[]
+        )
+    elif model == "16pymedeas_qc":
+        model = "pymedeas_qc"
+        config.aggregation = "16sectors_qc"
+        config.model_arguments.results_fname = "16qc.csv"
+        config.model_arguments.results_fpath =\
+            tmp_dir.joinpath(config.model_arguments.results_fname)
+        config.region = model
+        config.model = Model(
+            model_file=proj_folder.joinpath(
+                "models/pymedeas_qc/pymedeas_qc.py"),
+            subscripts_file="_subscripts_pymedeas_qc.json",
+            scenario_file="scen_qc.xlsx",
+            inputs_sheet="Quebec",
+            out_folder=tmp_dir,
+            out_default=default_vars[config.aggregation][model],
+            parent=[
+                ParentModel(
+                    name="pymedeas_w",
+                    default_results_folder=tmp_dir,
+                    results_file_path=tmp_dir.joinpath("16w.csv")
+                )
+            ]
+        )
     # get the data_file paths to load parent outputs
     data_files = [parent.results_file_path for parent in config.model.parent]
 
@@ -130,6 +170,17 @@ def shared_tmp_path(tmp_path_factory):
 @pytest.mark.filterwarnings("ignore")
 @pytest.mark.parametrize("model", ["14pymedeas_w", "14pymedeas_eu", "14pymedeas_cat"])
 def test_run_three_levels_14sectors_cat(
+    shared_tmp_path, proj_folder, default_vars, model
+):
+    """Run of the 3 models in cascade"""
+
+    model, config = select_model(shared_tmp_path, proj_folder, model, default_vars)
+    run(config, model)
+
+@pytest.mark.slow
+@pytest.mark.filterwarnings("ignore")
+@pytest.mark.parametrize("model", ["16pymedeas_w", "16pymedeas_qc"])
+def test_run_three_levels_16sectors_qc(
     shared_tmp_path, proj_folder, default_vars, model
 ):
     """Run of the 3 models in cascade"""
