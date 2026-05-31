@@ -190,20 +190,22 @@
     ],
     "SECTORS_and_HOUSEHOLDS": [
         "Households",
-        "Agriculture",
-        "Mining_quarrying_and_energy_supply",
-        "Food_Beverages_and_Tobacco",
-        "Textiles_and_leather_etc",
-        "Coke_refined_petroleum_nuclear_fuel_and_chemicals_etc",
-        "Electrical_and_optical_equipment_and_Transport_equipment",
-        "Other_manufacturing",
+        "Agriculture_Forestry",
+        "Manufacturing",
+        "Mining",
+        "Utilities",
         "Construction",
-        "Distribution",
-        "Hotels_and_restaurant",
-        "Transport_storage_and_communication",
-        "Financial_Intermediation",
-        "Real_estate_renting_and_busine_activitie",
-        "Non_Market_Service"
+        "Motor_Vehicles",
+        "Wholesale_Trade",
+        "Retail_Trade",
+        "Hotels_and_Restaurants",
+        "Transport",
+        "Post_and_Telecomm",
+        "Offices",
+        "Education",
+        "Health_and_Social_work",
+        "Other_Community_Social_and_Personal_Services",
+        "Private_Households"
     ],
     "Transport_Modes": [
         "Inland",
@@ -359,8 +361,6 @@
         "others"
     ],
     "sec_map_0": [
-        "sec15",
-        "sec16",
         "sec17",
         "sec18",
         "sec19",
@@ -372,7 +372,11 @@
         "sec25",
         "sec26",
         "sec27",
-        "sec28"
+        "sec28",
+        "sec29",
+        "sec30",
+        "sec31",
+        "sec32"
     ],
     "sec_map_1": [
         "sec1",
@@ -388,11 +392,11 @@
         "sec11",
         "sec12",
         "sec13",
-        "sec14"
+        "sec14",
+        "sec15",
+        "sec16"
     ],
     "secb_map_0": [
-        "secb15",
-        "secb16",
         "secb17",
         "secb18",
         "secb19",
@@ -404,7 +408,11 @@
         "secb25",
         "secb26",
         "secb27",
-        "secb28"
+        "secb28",
+        "secb29",
+        "secb30",
+        "secb31",
+        "secb32"
     ],
     "secb_map_1": [
         "secb1",
@@ -420,39 +428,45 @@
         "secb11",
         "secb12",
         "secb13",
-        "secb14"
+        "secb14",
+        "secb15",
+        "secb16"
     ],
     "sectors": [
-        "Agriculture",
-        "Mining_quarrying_and_energy_supply",
-        "Food_Beverages_and_Tobacco",
-        "Textiles_and_leather_etc",
-        "Coke_refined_petroleum_nuclear_fuel_and_chemicals_etc",
-        "Electrical_and_optical_equipment_and_Transport_equipment",
-        "Other_manufacturing",
+        "Agriculture_Forestry",
+        "Manufacturing",
+        "Mining",
+        "Utilities",
         "Construction",
-        "Distribution",
-        "Hotels_and_restaurant",
-        "Transport_storage_and_communication",
-        "Financial_Intermediation",
-        "Real_estate_renting_and_busine_activitie",
-        "Non_Market_Service"
+        "Motor_Vehicles",
+        "Wholesale_Trade",
+        "Retail_Trade",
+        "Hotels_and_Restaurants",
+        "Transport",
+        "Post_and_Telecomm",
+        "Offices",
+        "Education",
+        "Health_and_Social_work",
+        "Other_Community_Social_and_Personal_Services",
+        "Private_Households"
     ],
     "sectors1": [
-        "Agriculture",
-        "Mining_quarrying_and_energy_supply",
-        "Food_Beverages_and_Tobacco",
-        "Textiles_and_leather_etc",
-        "Coke_refined_petroleum_nuclear_fuel_and_chemicals_etc",
-        "Electrical_and_optical_equipment_and_Transport_equipment",
-        "Other_manufacturing",
+        "Agriculture_Forestry",
+        "Manufacturing",
+        "Mining",
+        "Utilities",
         "Construction",
-        "Distribution",
-        "Hotels_and_restaurant",
-        "Transport_storage_and_communication",
-        "Financial_Intermediation",
-        "Real_estate_renting_and_busine_activitie",
-        "Non_Market_Service"
+        "Motor_Vehicles",
+        "Wholesale_Trade",
+        "Retail_Trade",
+        "Hotels_and_Restaurants",
+        "Transport",
+        "Post_and_Telecomm",
+        "Offices",
+        "Education",
+        "Health_and_Social_work",
+        "Other_Community_Social_and_Personal_Services",
+        "Private_Households"
     ],
     "sectors_A_matrix": [
         "sec1",
@@ -482,7 +496,11 @@
         "sec25",
         "sec26",
         "sec27",
-        "sec28"
+        "sec28",
+        "sec29",
+        "sec30",
+        "sec31",
+        "sec32"
     ],
     "sectors_A_matrix1": [
         "secb1",
@@ -512,7 +530,11 @@
         "secb25",
         "secb26",
         "secb27",
-        "secb28"
+        "secb28",
+        "secb29",
+        "secb30",
+        "secb31",
+        "secb32"
     ],
     "vehicles_bat": [
         "electric_vehicles",
