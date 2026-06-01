@@ -25,7 +25,31 @@ from os import listdir
 from os.path import isfile, join
 from openpyxl import Workbook as wb
 from openpyxl.workbook.defined_name import DefinedName
-from openpyxl.utils import quote_sheetname, absolute_coordinate
+from openpyxl.utils import quote_sheetname, absolute_coordinate, get_column_letter
+
+
+def written_range(df: pd.DataFrame, startrow, startcol, header=True, index=True):
+    """Return the A1 range that df.to_excel(...) writes for the given start cell.
+
+    startrow/startcol are 0-indexed (as pandas to_excel expects).
+    data_only=True returns just the data cells (excludes header rows and index cols).
+    """
+    h = df.columns.nlevels if header else 0
+    i = df.index.nlevels if index else 0
+
+    top_row = startrow + 1 + h 
+    left_col = startcol + 1 + i 
+    bot_row = startrow + h + len(df)
+    right_col = startcol + i + len(df.columns)
+
+    return f"{get_column_letter(left_col)}{top_row}:{get_column_letter(right_col)}{bot_row}"
+
+def add_defined_name_section(writer, sheetname, name, data, startrow, startcol,header=True, index=True):
+    rng = written_range(data, startrow, startcol, header=header, index=index)
+    ws = writer.sheets[sheetname]
+    ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(rng)}"
+    ws.defined_names.add(DefinedName(name, attr_text=ref))
+
 
 #=======================================================================================================================
 #Read pruned data from 'prunedData.xlsx & prunedDataOther.xlsx' and make it into the arrays that are inputs for QC_IOT.py
@@ -128,10 +152,25 @@ wd = os.getcwd()
 all_years = np.array([2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018]) # this is useful for the getyearIndex function to always use 2004-2018 inclusively
 
 yearsString = ['2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018']
-csString = ['Agriculture_Forestry', 'Manufacturing', 'Mining', 'Utilities', 'Construction',
-                       'Motor_Vehicles', 'Wholesale_Trade', 'Retail_Trade', 'Hotel_Restaurants', 'Transport',
-                       'Post_Telecomm', 'Offices', 'Education', 'Health_SocialWork', 'Other_services',
-                       'Private_Households']
+
+csString = [
+    'Agriculture_Forestry',
+    'Manufacturing',
+    'Mining',
+    'Utilities',
+    'Construction',
+    'Motor_Vehicles',
+    'Wholesale_Trade',
+    'Retail_Trade',
+    'Hotel_Restaurants',
+    'Transport',
+    'Post_Telecomm',
+    'Offices',
+    'Education',
+    'Health_SocialWork',
+    'Other_services',
+    'Private_Households',
+]
 
 # max number of sectors (22/25 for 2004-2008 ; 32 for 2009-2017)
 maxNoSectors = 32
@@ -221,14 +260,10 @@ pE = {
                  34.70],
     'post_cour_mess': [13.44, 14.21, 14.00, 14.00, 13.93, 14.83, 14.94, 14.25, 13.39, 13.32, 13.38, 12.90, 11.99,
                        12.29, 12.29],
-    'minus post': [86.56, 85.79, 86.0, 86.0, 86.07, 85.17, 85.06, 85.75, 86.61, 86.68, 86.62, 87.1, 88.01, 87.71,
-                   87.71],
-    'education': [33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33,
-                  33.33],
-    'health_socialwork': [33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33,
-                          33.33, 33.33],
-    'art_nonprof_rel': [33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33,
-                        33.33, 33.33],
+    'minus post': [86.56, 85.79, 86.0, 86.0, 86.07, 85.17, 85.06, 85.75, 86.61, 86.68, 86.62, 87.1, 88.01, 87.71, 87.71],
+    'education': [33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33],
+    'health_socialwork': [33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33],
+    'art_nonprof_rel': [33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33, 33.33],
     'paper_publishing': [15.38, 16.04, 16.47, 17.77, 16.62, 15.81, 15.15, 13.49, 12.96, 13.89, 14.18, 14.05, 12.48,
                          11.96, 11.96],
     'minus telecomm&paperpub': [40.71, 41.02, 42.4, 41.42, 41.13, 40.96, 44.25, 46.08, 46.78, 49.29, 51.97, 53.53,
@@ -1388,10 +1423,24 @@ csVAArray = as_to_cs(asVAArray)
 # reagg asIEcanArray & asFEcanArray (56 sectors) to csIEcanArray & csFEcanArray (16 common sectors) (see workplan data)
 # reaggregate to 16*16
 # world (56) -> common sectors (16)
-world56_to_common = {1: [1, 2, 3], 2: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 3: [4],
-                     4: [24, 25], 5: [27], 6: [28], 7: [29], 8: [30], 9: [36], 10: [31, 32, 33, 34], 11: [35, 39],
-                     12: [26, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 56], 13: [52], 14: [53], 15: [37, 38, 54],
-                     16: [55]}
+world56_to_common = {
+    1: [1, 2, 3],
+    2: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+    3: [4],
+    4: [24, 25],
+    5: [27],
+    6: [28],
+    7: [29],
+    8: [30],
+    9: [36],
+    10: [31, 32, 33, 34],
+    11: [35, 39],
+    12: [26, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 56],
+    13: [52],
+    14: [53],
+    15: [37, 38, 54],
+    16: [55],
+}
 
 for year in years:
     yearIndex = getyearindex(years, year)
@@ -1430,10 +1479,24 @@ tempar = temp.to_numpy().reshape(len(temp.index), len(temp.columns))
 asLCworldArray[:, 0:len(temp.columns)] = tempar[:, :] #asLCworldArray is 2000-2018 (2015-2018 empty)
 # aggregate across common sectors
 # reaggregate from 56 --> 16 sectors (CAPLABVA)
-world56_to_common = {1: [1, 2, 3], 2: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 3: [4],
-                     4: [24, 25], 5: [27], 6: [28], 7: [29], 8: [30], 9: [36], 10: [31, 32, 33, 34], 11: [35, 39],
-                     12: [26, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 56], 13: [52], 14: [53], 15: [37, 38, 54],
-                     16: [55]}
+world56_to_common = {
+    1: [1, 2, 3],
+    2: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+    3: [4],
+    4: [24, 25],
+    5: [27],
+    6: [28],
+    7: [29],
+    8: [30],
+    9: [36],
+    10: [31, 32, 33, 34],
+    11: [35, 39],
+    12: [26, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 56],
+    13: [52],
+    14: [53],
+    15: [37, 38, 54],
+    16: [55],
+}
 
 for year in range(2000, 2014+1):
     print('Reaggregating CAP/LAB world from 56 to 16 sectors for year', year)
@@ -1780,9 +1843,17 @@ yearsColumns = np.arange(1995, 2019)
 #Quebec stuff for writing in excel spreadsheet in the MEDEAS input format
 
 #econometric variables
-OutputQCIndexListNames = ['Capital Compensation', 'Labour Compensation', 'Gross Fixed Capital Formation',
-                        'Households demand', 'Government expenditures', 'Change in inventories', 'Final demand RoW',
-                        'Exports of FINALS GOODS to RoW']
+OutputQCIndexListNames = [
+    'Capital Compensation',
+    'Labour Compensation',
+    'Gross Fixed Capital Formation',
+    'Households demand',
+    'Government expenditures',
+    'Change in inventories',
+    'Final demand RoW',
+    'Exports of FINALS GOODS to RoW',
+]
+
 OutputQCIndexListNamesShort = ['CC', 'LC', 'GFCF', 'HH', 'GE', 'INV', 'FDrow', 'FErow']
 
 #multiindex because the first two columns are indices
@@ -1794,7 +1865,7 @@ for name in OutputQCIndexListNames:
 OutputQCValuesList = [csCCArray, csLCArray, csGFCFArray, csHHArray,csGEArray, csINVArray, csFDrowArray, csFEArray]
 #Excel locations QC
 OutputQuebecExcelLocationList = [ #[row, col] for each econometric variable
-    [1,1],[19,1],[37,1],[55,1],[73,1],[91,1],[109,1],[127,1], # CC, LC, ..., FErow
+    [1,1],[19,1],[37,1],[55,1],[73,1],[91,1],[109,1],[127, 1], # CC, LC, ..., FErow
     [146,1], #EI
     [233,1],[235,1], #GDP
     [239,1] #A matrices
@@ -1849,57 +1920,108 @@ a=['World ']*len(csString)
 b=csString
 A4Wcolind = [i + j for i, j in zip(a,b)]
 
-# WRITE
 with pd.ExcelWriter(path, engine='openpyxl') as writer:
 # WRITE QC econometric variables (CC, LC, GFCF, ..., FErow)
     for i in range(len(OutputQCIndexListNames)):
-        data = pd.DataFrame(data=np.append(csEmptyYearsArray, OutputQCValuesList[i], axis=1), columns=yearsColumns,
-                            index=OutputQCIndexList[i])
-        data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=True,
-                      startrow=OutputQuebecExcelLocationList[i][0]-1, startcol=OutputQuebecExcelLocationList[i][1]-1)
+        data = pd.DataFrame(
+            data=np.append(csEmptyYearsArray, OutputQCValuesList[i], axis=1),
+            columns=yearsColumns,
+            index=OutputQCIndexList[i]
+        )
+        startrow = OutputQuebecExcelLocationList[i][0] - 1
+        startcol = OutputQuebecExcelLocationList[i][1] - 1
+        sheetname='Quebec'
+        data.to_excel(
+            writer,
+            sheet_name=sheetname,
+            na_rep='na',
+            header=True,
+            index=True,
+            startrow=startrow,
+            startcol=startcol
+        )
+        add_defined_name_section(writer, sheetname, "TODO", data, startrow, startcol, header=True, index=True)
 # WRITE World econometric variables (CC, LC, GFCF, ..., INV)
     for i in range(len(OutputWorldIndexListNames)):
-        data = pd.DataFrame(data=np.append(csEmptyYearsArray, OutputWorldValuesList[i], axis=1), columns=yearsColumns,
-                            index=OutputWorldIndexList[i])
-        data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=True,
-                      startrow=OutputWorldExcelLocationList[i][0]-1, startcol=OutputWorldExcelLocationList[i][1]-1)
+        data = pd.DataFrame(
+            data=np.append(csEmptyYearsArray, OutputWorldValuesList[i], axis=1),
+            columns=yearsColumns,
+            index=OutputWorldIndexList[i]
+        )
+        startrow=OutputWorldExcelLocationList[i][0]-1
+        startcol=OutputWorldExcelLocationList[i][1]-1
+        sheetname='World'
+        data.to_excel(
+            writer,
+            sheet_name=sheetname,
+            na_rep='na',
+            header=True,
+            index=True,
+            startrow=startrow,
+            startcol=startcol
+        )
+        add_defined_name_section(writer, sheetname, "TODO", data, startrow, startcol, header=True, index=True)
 # WRITE EI data
     # QC
     data = pd.DataFrame(data=EI_QCArray, index=EIindex, columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=True, startrow=145-1, startcol=1-1)
+    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+
     #WORLD
-    data = pd.DataFrame(data=np.concatenate((EIemptyYearsArray1, EIworldMedeasFormat, EIemptyYearsArray2), axis=1),
-                        index=EIindex, columns=yearsColumns)
+    data = pd.DataFrame(
+        data=np.concatenate((EIemptyYearsArray1, EIworldMedeasFormat, EIemptyYearsArray2,), axis=1),
+        index=EIindex,
+        columns=yearsColumns
+    )
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=True, startrow=110-1, startcol=1-1)
+    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
 
 #GDP for both
     #QC
     data = pd.DataFrame(data=GDPArrayMedeasFormat, columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=False, startrow=233-1, startcol=3-1)
+    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+
     data = pd.DataFrame(data=None, columns=['historic GDP', '(M$)'])
     data.to_excel(writer, sheet_name='Quebec', index=False, header=True, startrow=233-1,startcol=1-1)
+    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
     #World
     data = pd.DataFrame(data=GDPwArrayMedeasFormat, columns=yearsColumns)
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=False, startrow=197-1, startcol=3-1)
+    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
+
     data = pd.DataFrame(data=None, columns=['historic GDP', '(M$)'])
     data.to_excel(writer, sheet_name='World', header=True, index=False, startrow=197 - 1, startcol=1 - 1)
+    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
 #GDPpc projection growth for both
     #QC
     data = pd.DataFrame(data=np.full(fill_value=np.nan, shape=(1,24)), columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=False, startrow=235 - 1, startcol=3 - 1)
+    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+    
     data = pd.DataFrame(data=None, columns=['GDPpc projection growth', '(Dmnl)'])
     data.to_excel(writer, sheet_name='Quebec', header=True, index=False, startrow=235 - 1, startcol=1 - 1)
+    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+    
     #World
     data = pd.DataFrame(data=np.full(fill_value=np.nan, shape=(1, 24)), columns=yearsColumns)
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=False, startrow=199 - 1, startcol=3 - 1)
+    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
+
+
     data = pd.DataFrame(data=None, columns=['GDPpc projection growth', '(Dmnl)'])
     data.to_excel(writer, sheet_name='World', header=True, index=False, startrow=199 - 1, startcol=1 - 1)
-# WRITE A matrices
+    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
+
+    # WRITE A matrices
 # Write header of the A matrix section
     data = pd.DataFrame(data=None, columns=['A matrix', '(Dmnl)'])
     data.to_excel(writer, sheet_name='Quebec', index=None, startrow= 238-1, startcol=1-1)
+    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+
     data = pd.DataFrame(data=None, columns=['A matrix', '(Dmnl)'])
     data.to_excel(writer, sheet_name='World', index=None, startrow= 202-1, startcol=1-1)
+    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
 # Write A matrices for QC and World
     for year in yearsColumns:
         yearIndex = year - 1995
@@ -1908,11 +2030,13 @@ with pd.ExcelWriter(path, engine='openpyxl') as writer:
         data = pd.DataFrame(data=A4medeasFormat[:, :, yearIndex], columns=A4QCcolind, index=A4QCcolind)
         data.index.name = str(year)
         data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, startrow=startrow, startcol=1-1)
+        add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
 # A matrix for World
         startrow = 203-1+yearIndex*17 #203 is excel actual row number, 17 is gap between consecutive years
         data = pd.DataFrame(data=A_ICwMedeasFormat[:, :, yearIndex], columns=A4Wcolind, index=A4Wcolind)
         data.index.name = str(year)
         data.to_excel(writer, sheet_name='World', na_rep='na', header=True, startrow=startrow, startcol=1-1)
+        add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
 
 
 #Coefficients (econometric regressions and energy intensity rates from jupyter notebooks)
@@ -1927,6 +2051,7 @@ with pd.ExcelWriter(path, engine='openpyxl') as writer:
         data.to_excel(writer, sheet_name=coeffSheetNames[i], na_rep='na', header=True,
                       index=False, startrow=coeffExcelLocation[i][0]-1-1 # -1  because there is a header, -1 because first row is 0
                       , startcol=coeffExcelLocation[i][1]-1) # -1 because first row is 0
+        add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=False)
 
 #TO DO: clean up code to make it elegant and organized
 

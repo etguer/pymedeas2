@@ -1,0 +1,26 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.14",
+  "pythonPlatform": "Darwin",
+  "include": [
+    "run.py",
+    "tools",
+    "tests",
+    "16sec_qc_data_code"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    ".venv",
+    "logs",
+    "outputs",
+    "models",
+    "scenarios",
+    "docs"
+  ],
+  "extraPaths": [
+    "."
+  ],
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": "none"
+}
