@@ -2091,7 +2091,7 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
         data = pd.DataFrame(data=A_ICwMedeasFormat[:, :, yearIndex], columns=A4Wcolind, index=A4Wcolind)
         data.index.name = str(year)
         data.to_excel(writer, sheet_name='World', na_rep='na', header=True, startrow=startrow, startcol=1-1)
-        add_defined_name_section(writer, 'Quebec', A4medeasFormatDefinedNames[yearIndex], data, startrow=startrow, startcol=1-1, header=True, index=True)
+        add_defined_name_section(writer, 'World', A4medeasFormatDefinedNames[yearIndex], data, startrow=startrow, startcol=1-1, header=True, index=True)
 
 #Coefficients (econometric regressions and energy intensity rates from jupyter notebooks)
 # Read
