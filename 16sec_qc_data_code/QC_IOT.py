@@ -23,7 +23,7 @@ import os.path
 import openpyxl
 from os import listdir
 from os.path import isfile, join
-from openpyxl import Workbook as wb
+from openpyxl import workbook as wb
 from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.utils import quote_sheetname, absolute_coordinate, get_column_letter
 
@@ -56,9 +56,10 @@ def add_defined_name_section(writer, sheetname, name, data, startrow, startcol,h
 #=======================================================================================================================
 #directory
 # Change working directory (Étienne MacOS)
-os.chdir('/Users/Etguer/pymedeasQCdata/QC_IOT_data/QC_IOTpy_input')  # need to use '/' or '//' instead of '\'
+#os.chdir('/Users/Etguer/pymedeasQCdata/QC_IOT_data/QC_IOTpy_input')  # need to use '/' or '//' instead of '\'
 # Change working directory (Étienne laptop)
-# os.chdir('C:/Users/user/PycharmProjects/MEDEAS_QC_data')
+os.chdir('G:/Other computers/My iMac/QC_IOTpy_input')
+
 wd = os.getcwd()
 
 #declare arrays (pruned) & other variables
@@ -1689,7 +1690,8 @@ A4 = np.concatenate((temptop, tempbot), axis=0)
 #   Read <Emission relevant energy use> files for each country
 
 # get list of all files in directory
-os.chdir('/Users/Etguer/pymedeasQCdata/QC_IOT_data/QC_IOTpy_input')  # need to use '/' or '//' instead of '\'
+os.chdir('G:/Other computers/My iMac/QC_IOTpy_input')
+#os.chdir('/Users/Etguer/pymedeasQCdata/QC_IOT_data/QC_IOTpy_input')  # need to use '/' or '//' instead of '\'
 directory = 'EmRel10/'
 allfiles = [f for f in listdir(directory) if isfile(join(directory, f))]
 years = np.array([2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014])
@@ -1804,7 +1806,8 @@ for row in range(0,5):
 
 # Read all Mean Intensity Rates and Regressions coefficients and write them to economydata.xlsx
 # Read them
-os.chdir('/Users/Etguer/pymedeasQCdata/QC_IOT_data/')  # need to use '/' or '//' instead of '\'
+os.chdir('G:/Other computers/My iMac/QC_IOTpy_input')
+#os.chdir('/Users/Etguer/pymedeasQCdata/QC_IOT_data/')  # need to use '/' or '//' instead of '\'
 directoryCoeffs = 'jupyter_output/'
 writepath = os.getcwd() + '/' + 'economydata.xlsx'
 #list of names
@@ -1854,6 +1857,17 @@ OutputQCIndexListNames = [
     'Exports of FINALS GOODS to RoW',
 ]
 
+OutputQCIndexListDefNames = [
+    'historic_capital_compensation',
+    'historic_labour_compensation',
+    'historic_GFCF',
+    'historic_HD',
+    'historic_government_expenditures',
+    'historic_change_in_inventories',
+    'historic_demand_RoW',
+    'historic_exports_demand'
+]
+
 OutputQCIndexListNamesShort = ['CC', 'LC', 'GFCF', 'HH', 'GE', 'INV', 'FDrow', 'FErow']
 
 #multiindex because the first two columns are indices
@@ -1873,6 +1887,7 @@ OutputQuebecExcelLocationList = [ #[row, col] for each econometric variable
 
 #World stuff for writing in excel spreadsheet in the MEDEAS input format
 OutputWorldIndexListNames = OutputQCIndexListNames[0:-2] #remove last two items
+OutputWorldIndexListDefNames = OutputQCIndexListDefNames[0:-2] #remove last two items this is the defined names that link excel variables to pymedeas
 OutputWorldIndexListNmesShort = OutputQCIndexListNamesShort[0:-2]
 OutputWorldIndexList = OutputQCIndexList[0:-2]
 OutputWorldValuesList =  [csCCworldArray, csLCworldArray, csGFCFwArray, csHHwArray, csGEwArray, csINVwArray]
@@ -1884,7 +1899,8 @@ OutputWorldExcelLocationList = [ #[row, col] for each econometric variable
 ]
 
 # WRITE all data to an excel workbook (economydata.xlsx)
-path = '/Users/Etguer/pymedeasQCdata/QC_IOT_data/medeasQC_input/economydata.xlsx'
+#path = '/Users/Etguer/pymedeasQCdata/QC_IOT_data/medeasQC_input/economydata.xlsx'
+#path = 'G:/Other computers/My iMac/medeasQC_input/QCinputMay2026/economydata.xlsx'
 
 # PREPARE arrays to be made into dataframes, create (multi)indices
 
@@ -1910,6 +1926,33 @@ A_ICwEmptyYearsArray2 = np.full(fill_value = np.nan, shape = np.concatenate((A_I
 A4medeasFormat = np.concatenate((A4emptyYearsArray1,A4,A4emptyYearsArray2), axis=2)
 A_ICwMedeasFormat = np.concatenate((A_ICwEmptyYearsArray1,A_ICw,A_ICwEmptyYearsArray2), axis=2)
 
+A4medeasFormatDefinedNames=[
+'historic_A_Matrix_year1995',
+'historic_A_Matrix_year1996',
+'historic_A_Matrix_year1997',
+'historic_A_Matrix_year1998',
+'historic_A_Matrix_year1999',
+'historic_A_Matrix_year2000',
+'historic_A_Matrix_year2001',
+'historic_A_Matrix_year2002',
+'historic_A_Matrix_year2003',
+'historic_A_Matrix_year2004',
+'historic_A_Matrix_year2005',
+'historic_A_Matrix_year2006',
+'historic_A_Matrix_year2007',
+'historic_A_Matrix_year2008',
+'historic_A_Matrix_year2009',
+'historic_A_Matrix_year2010',
+'historic_A_Matrix_year2011',
+'historic_A_Matrix_year2012',
+'historic_A_Matrix_year2013',
+'historic_A_Matrix_year2014',
+'historic_A_Matrix_year2015',
+'historic_A_Matrix_year2016',
+'historic_A_Matrix_year2017',
+'historic_A_Matrix_year2018',
+]
+
 #create index/columns for A matrices
 #QC
 a=['QC ']*len(csString)+['RoW ']*len(csString)
@@ -1920,7 +1963,15 @@ a=['World ']*len(csString)
 b=csString
 A4Wcolind = [i + j for i, j in zip(a,b)]
 
-with pd.ExcelWriter(path, engine='openpyxl') as writer:
+
+
+#=========================================================================
+# ============================= WRITE ====================================
+#=========================================================================
+os.chdir('C:/Users/thinkpad/PycharmProjects/pymedeas2qc')
+path = './pymedeas2/16sec_qc_data_code/16sec_qc_models_input_May2026/'
+filename = 'economy.xlsx'
+with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
 # WRITE QC econometric variables (CC, LC, GFCF, ..., FErow)
     for i in range(len(OutputQCIndexListNames)):
         data = pd.DataFrame(
@@ -1940,7 +1991,7 @@ with pd.ExcelWriter(path, engine='openpyxl') as writer:
             startrow=startrow,
             startcol=startcol
         )
-        add_defined_name_section(writer, sheetname, "TODO", data, startrow, startcol, header=True, index=True)
+        add_defined_name_section(writer, sheetname, OutputQCIndexListDefNames[i], data, startrow, startcol, header=True, index=True)
 # WRITE World econometric variables (CC, LC, GFCF, ..., INV)
     for i in range(len(OutputWorldIndexListNames)):
         data = pd.DataFrame(
@@ -1960,12 +2011,19 @@ with pd.ExcelWriter(path, engine='openpyxl') as writer:
             startrow=startrow,
             startcol=startcol
         )
-        add_defined_name_section(writer, sheetname, "TODO", data, startrow, startcol, header=True, index=True)
+        add_defined_name_section(writer, sheetname, OutputWorldIndexListDefNames[i], data, startrow, startcol, header=True, index=True)
+
+
+
 # WRITE EI data
     # QC
     data = pd.DataFrame(data=EI_QCArray, index=EIindex, columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=True, startrow=145-1, startcol=1-1)
-    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_electricity", data.xs('ELEC',level=1), startrow=145 - 1, startcol=1, header=True, index=True)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_heat", data.xs('HEAT',level=1), startrow=145 - 1+17, startcol=1, header=True, index=True)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_liquids", data.xs('LIQUIDS',level=1), startrow=145 - 1+17*2, startcol=1 , header=True, index=True)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_gases", data.xs('GAS',level=1), startrow=145 - 1+17*3, startcol=1, header=True, index=True)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_solids", data.xs('SOLIDS',level=1), startrow=145 - 1+17*4, startcol=1, header=True, index=True)
 
     #WORLD
     data = pd.DataFrame(
@@ -1974,54 +2032,51 @@ with pd.ExcelWriter(path, engine='openpyxl') as writer:
         columns=yearsColumns
     )
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=True, startrow=110-1, startcol=1-1)
-    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
-
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_electricity", data.xs('ELEC',level=1), startrow=110 - 1, startcol=1, header=True, index=True)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_heat", data.xs('HEAT',level=1), startrow=110 - 1+17, startcol=1, header=True, index=True)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_liquids", data.xs('LIQUIDS',level=1), startrow=110 - 1+17*2, startcol=1 , header=True, index=True)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_gases", data.xs('GAS',level=1), startrow=110 - 1+17*3, startcol=1, header=True, index=True)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_solids", data.xs('SOLIDS',level=1), startrow=110 - 1+17*4, startcol=1, header=True, index=True)
 #GDP for both
     #QC
     data = pd.DataFrame(data=GDPArrayMedeasFormat, columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=False, startrow=233-1, startcol=3-1)
-    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+    add_defined_name_section(writer, 'Quebec', "historic_GDP", data, 233 - 1, 3-1, header=False, index=False)
 
     data = pd.DataFrame(data=None, columns=['historic GDP', '(M$)'])
     data.to_excel(writer, sheet_name='Quebec', index=False, header=True, startrow=233-1,startcol=1-1)
-    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+
     #World
     data = pd.DataFrame(data=GDPwArrayMedeasFormat, columns=yearsColumns)
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=False, startrow=197-1, startcol=3-1)
-    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
+    add_defined_name_section(writer, 'World', "historic_GDP", data, 197-1, 3-1, header=False, index=False)
 
     data = pd.DataFrame(data=None, columns=['historic GDP', '(M$)'])
     data.to_excel(writer, sheet_name='World', header=True, index=False, startrow=197 - 1, startcol=1 - 1)
-    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
 #GDPpc projection growth for both
     #QC
     data = pd.DataFrame(data=np.full(fill_value=np.nan, shape=(1,24)), columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=False, startrow=235 - 1, startcol=3 - 1)
-    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+    add_defined_name_section(writer, 'Quebec', "input_GDPpc_annual_growth", data, 235-1, 3-1, header=False, index=False)
     
     data = pd.DataFrame(data=None, columns=['GDPpc projection growth', '(Dmnl)'])
     data.to_excel(writer, sheet_name='Quebec', header=True, index=False, startrow=235 - 1, startcol=1 - 1)
-    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
-    
+
     #World
     data = pd.DataFrame(data=np.full(fill_value=np.nan, shape=(1, 24)), columns=yearsColumns)
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=False, startrow=199 - 1, startcol=3 - 1)
-    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
-
+    add_defined_name_section(writer, 'World', "input_GDPpc_annual_growth", data, 199-1, 3-1, header=False, index=False)
 
     data = pd.DataFrame(data=None, columns=['GDPpc projection growth', '(Dmnl)'])
     data.to_excel(writer, sheet_name='World', header=True, index=False, startrow=199 - 1, startcol=1 - 1)
-    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
 
     # WRITE A matrices
 # Write header of the A matrix section
     data = pd.DataFrame(data=None, columns=['A matrix', '(Dmnl)'])
     data.to_excel(writer, sheet_name='Quebec', index=None, startrow= 238-1, startcol=1-1)
-    add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
 
     data = pd.DataFrame(data=None, columns=['A matrix', '(Dmnl)'])
     data.to_excel(writer, sheet_name='World', index=None, startrow= 202-1, startcol=1-1)
-    add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
 # Write A matrices for QC and World
     for year in yearsColumns:
         yearIndex = year - 1995
@@ -2030,28 +2085,73 @@ with pd.ExcelWriter(path, engine='openpyxl') as writer:
         data = pd.DataFrame(data=A4medeasFormat[:, :, yearIndex], columns=A4QCcolind, index=A4QCcolind)
         data.index.name = str(year)
         data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, startrow=startrow, startcol=1-1)
-        add_defined_name_section(writer, 'Quebec', "TODO", data, 145-1, 1-1, header=True, index=True)
+        add_defined_name_section(writer, 'Quebec', A4medeasFormatDefinedNames[yearIndex], data, startrow=startrow, startcol=1-1, header=True, index=True)
 # A matrix for World
         startrow = 203-1+yearIndex*17 #203 is excel actual row number, 17 is gap between consecutive years
         data = pd.DataFrame(data=A_ICwMedeasFormat[:, :, yearIndex], columns=A4Wcolind, index=A4Wcolind)
         data.index.name = str(year)
         data.to_excel(writer, sheet_name='World', na_rep='na', header=True, startrow=startrow, startcol=1-1)
-        add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=True)
-
+        add_defined_name_section(writer, 'Quebec', A4medeasFormatDefinedNames[yearIndex], data, startrow=startrow, startcol=1-1, header=True, index=True)
 
 #Coefficients (econometric regressions and energy intensity rates from jupyter notebooks)
 # Read
+
+    coeffsListDefinedNames = [['beta_0_EXP', 'beta_1_EXP'],
+                          ['beta_0_GFCF', 'beta_1_GFCF'],
+                          ['beta_0_HD', 'beta_1_HD'],
+                          ['historic_mean_rate_energy_intenity_electricity',
+                           'historic_mean_rate_energy_intensity_gases', 'historic_mean_rate_energy_intensity_heat',
+                           'historic_mean_rate_energy_intensity_liquids', 'historic_mean_rate_energy_intensity_solids'],
+                          ['beta_0_GFCF', 'beta_1_GFCF'],
+                          ['beta_0_HD', 'beta_1_HD'],
+                          ['historic_mean_rate_energy_intenity_electricity',
+                           'historic_mean_rate_energy_intensity_gases', 'historic_mean_rate_energy_intensity_heat',
+                           'historic_mean_rate_energy_intensity_liquids', 'historic_mean_rate_energy_intensity_solids']]
+
+    path = 'G:/Other computers/My iMac/jupyter_output/'
     for i in range(len(coeffFileNames)):
-        data = pd.read_csv(directoryCoeffs + coeffFileNames[i], header=None, index_col=None)
+        data = pd.read_csv(path+coeffFileNames[i], header=None, index_col=None)
         #drop 3rd columns when applicable
         if data.shape[1] > 2:
             data.drop(labels=2, axis=1, inplace=True)
         data.columns = coeffColumnNames[i]
-        #write in economydata.xlsx
-        data.to_excel(writer, sheet_name=coeffSheetNames[i], na_rep='na', header=True,
-                      index=False, startrow=coeffExcelLocation[i][0]-1-1 # -1  because there is a header, -1 because first row is 0
-                      , startcol=coeffExcelLocation[i][1]-1) # -1 because first row is 0
-        add_defined_name_section(writer, 'World', "TODO", data, 145-1, 1-1, header=True, index=False)
+        if data.shape[1] == 2:
+        #split into one defined name per data (so split beta0 and beta1 into 2)
+        #beta 0
+            datatemp=data[[data.columns[0]]]
+            datatemp.to_excel(writer, sheet_name=coeffSheetNames[i], na_rep='na', header=True,
+                           index=False, startrow=coeffExcelLocation[i][0] - 1 - 1,
+                           # -1  because there is a header, -1 because first row is 0
+                           startcol=coeffExcelLocation[i][1]-1)  # -1 because first row is 0
+            add_defined_name_section(writer, coeffSheetNames[i], coeffsListDefinedNames[i][0], datatemp,
+                                 startrow=coeffExcelLocation[i][0] - 1 - 1, startcol=coeffExcelLocation[i][1] - 1,
+                                 header=True, index=False)
+        #beta 1
+            datatemp=data[[data.columns[1]]]
+            datatemp=datatemp.dropna()
+            datatemp.to_excel(writer, sheet_name=coeffSheetNames[i], na_rep='na', header=True,
+                          index=False, startrow=coeffExcelLocation[i][0] - 1 - 1,
+                          # -1  because there is a header, -1 because first row is 0
+                          startcol=coeffExcelLocation[i][1])  # -1 because first row is 0
+            add_defined_name_section(writer, coeffSheetNames[i], coeffsListDefinedNames[i][1], datatemp,
+                                 startrow=coeffExcelLocation[i][0] - 1 - 1, startcol=coeffExcelLocation[i][1],
+                                 header=True, index=False)
+        elif coeffFileNames[i].startswith('meir'):
+            data.index = ['ELEC']*17 + ['HEAT']*17 + ['LIQUIDS']*17 + ['GAS']*17 + ['SOLIDS']*17
+            data.to_excel(writer, sheet_name=coeffSheetNames[i], na_rep='na', header=True,
+                              index=False, startrow=coeffExcelLocation[i][0] - 1 - 1,
+                              # -1  because there is a header, -1 because first row is 0
+                              startcol=coeffExcelLocation[i][1] - 1)  # -1 because first row is 0
+            add_defined_name_section(writer, coeffSheetNames[i], 'historic_mean_rate_energy_intensity_electricity', data.loc[['ELEC']],
+                                    startrow=coeffExcelLocation[i][0]-1-1, startcol=coeffExcelLocation[i][1]-1, header=True, index=False)
+            add_defined_name_section(writer, coeffSheetNames[i], 'historic_mean_rate_energy_intensity_heat', data.loc[['HEAT']],
+                                    startrow=coeffExcelLocation[i][0] - 1 - 1+17, startcol=coeffExcelLocation[i][1] - 1, header=True, index=False)
+            add_defined_name_section(writer, coeffSheetNames[i], 'historic_mean_rate_energy_intensity_liquids', data.loc[['LIQUIDS']],
+                                    startrow=coeffExcelLocation[i][0] - 1 - 1+17*2, startcol=coeffExcelLocation[i][1] - 1, header=True, index=False)
+            add_defined_name_section(writer, coeffSheetNames[i], 'historic_mean_rate_energy_intensity_gases', data.loc[['GAS']],
+                                    startrow=coeffExcelLocation[i][0] - 1 - 1 + 17*3, startcol=coeffExcelLocation[i][1] - 1, header=True, index=False)
+            add_defined_name_section(writer, coeffSheetNames[i], 'historic_mean_rate_energy_intensity_solids', data.loc[['SOLIDS']],
+                                    startrow=coeffExcelLocation[i][0] - 1 - 1 + 17*4, startcol=coeffExcelLocation[i][1] - 1, header=True, index=False)
 
 #TO DO: clean up code to make it elegant and organized
 
@@ -2065,62 +2165,63 @@ with pd.ExcelWriter(path, engine='openpyxl') as writer:
 # ws = wb['World']
 # [[value.name, value.attr_text] for value in ws.defined_names.values() ]
 
-defnsWorld_List = [ #all defined names edited to my custom Quebec/World economy.xlsx data
- ['beta_0_GFCF', '$AB$38:$AB$53'], ['beta_0_HD', '$AB$56:$AB$71'],
- ['beta_1_GFCF', '$AC$38:$AC$38'], ['beta_1_HD', '$AC$56:$AC$56'],
-
- ['historic_A_Matrix_year1995', '$B$204:$Q$219'], ['historic_A_Matrix_year1996', '$B$221:$Q$236'],
- ['historic_A_Matrix_year1997', '$B$238:$Q$253'], ['historic_A_Matrix_year1998', '$B$255:$Q$270'],
- ['historic_A_Matrix_year1999', '$B$272:$Q$287'],
- ['historic_A_Matrix_year2000', '$B$289:$Q$304'], ['historic_A_Matrix_year2001', '$B$306:$Q$321'],
- ['historic_A_Matrix_year2002', '$B$323:$Q$338'], ['historic_A_Matrix_year2003', '$B$340:$Q$355'],
- ['historic_A_Matrix_year2004', '$B$357:$Q$372'], ['historic_A_Matrix_year2005', '$B$374:$Q$389'],
- ['historic_A_Matrix_year2006', '$B$391:$Q$406'], ['historic_A_Matrix_year2007', '$B$408:$Q$423'],
- ['historic_A_Matrix_year2008', '$B$425:$Q$440'], ['historic_A_Matrix_year2009', '$B$442:$Q$457'],
- ['historic_A_Matrix_year2010', '$B$459:$Q$474'], ['historic_A_Matrix_year2011', '$B$476:$Q$491'],
- ['historic_A_Matrix_year2012', '$B$493:$Q$508'], ['historic_A_Matrix_year2013', '$B$510:$Q$525'],
- ['historic_A_Matrix_year2014', '$B$527:$Q$542'],
-
- ['historic_capital_compensation', '$C$2:$V$17'], #setting it as in OG economy file, that is to say all sectors from 1995 to ***2014***
- ['historic_change_in_inventories', '$C$92:$Q$107'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
- ['historic_GFCF', '$C$38:$Q$53'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
- ['historic_goverment_expenditures', '$C$74:$Q$89'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
- ['historic_HD', '$C$56:$Q$71'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
- ['historic_labour_compensation', '$C$20:$V$35'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
-
- ['historic_final_energy_intensity_electricity', '$C$111:$Q$127'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
- ['historic_final_energy_intensity_gases', '$C$162:$Q$178'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
- ['historic_final_energy_intensity_heat', '$C$128:$Q$144'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
- ['historic_final_energy_intensity_liquids', '$C$145:$Q$161'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
- ['historic_final_energy_intensity_solids', '$C$179:$Q$195'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
-
- ['historic_GDP', '$C$198:$V$198'],
-
- ['historic_mean_rate_energy_intensity_electricity', '$AB$111:$AB$127'],
- ['historic_mean_rate_energy_intensity_gases', '$AB$162:$AB$178'],
- ['historic_mean_rate_energy_intensity_heat', '$AB$128:$AB$144'],
- ['historic_mean_rate_energy_intensity_liquids', '$AB$145:$AB$161'],
- ['historic_mean_rate_energy_intensity_solids', '$AB$179:$AB$195'],
-
- ['input_GDPpc_annual_growth', '$C$200:$AL$200'], ['time_index_projection', '$C$199:$AL$199'], #this data be missin in my economy file
- ['time_index2009', '$C$1:$Q$1'], ['time_index2014', '$C$1:$V$1']
- ]
+# defnsWorld_List = [ #all defined names edited to my custom Quebec/World economy.xlsx data
+#  ['beta_0_GFCF', '$AB$38:$AB$53'], ['beta_0_HD', '$AB$56:$AB$71'],
+# #  ['beta_1_GFCF', '$AC$38:$AC$38'], ['beta_1_HD', '$AC$56:$AC$56'],
+#
+#  ['historic_A_Matrix_year1995', '$B$204:$Q$219'], ['historic_A_Matrix_year1996', '$B$221:$Q$236'],
+#  ['historic_A_Matrix_year1997', '$B$238:$Q$253'], ['historic_A_Matrix_year1998', '$B$255:$Q$270'],
+#  ['historic_A_Matrix_year1999', '$B$272:$Q$287'],
+#  ['historic_A_Matrix_year2000', '$B$289:$Q$304'], ['historic_A_Matrix_year2001', '$B$306:$Q$321'],
+#  ['historic_A_Matrixyear2002', '$B$323:$Q$338'], ['historic_A_Matrix_year2003', '$B$340:$Q$355'],
+#  ['historic_A_Matrix_year2004', '$B$357:$Q$372'], ['historic_A_Matrix_year2005', '$B$374:$Q$389'],
+#  ['historic_A_Matrix_year2006', '$B$391:$Q$406'], ['historic_A_Matrix_year2007', '$B$408:$Q$423'],
+#  ['historic_A_Matrix_year2008', '$B$425:$Q$440'], ['historic_A_Matrix_year2009', '$B$442:$Q$457'],
+#  ['historic_A_Matrix_year2010', '$B$459:$Q$474'], ['historic_A_Matrix_year2011', '$B$476:$Q$491'],
+#  ['historic_A_Matrix_year2012', '$B$493:$Q$508'], ['historic_A_Matrix_year2013', '$B$510:$Q$525'],
+#  ['historic_A_Matrix_year2014', '$B$527:$Q$542'],
+#
+#  ['historic_capital_compensation', '$C$2:$V$17'], #setting it as in OG economy file, that is to say all sectors from 1995 to ***2014***
+#  ['historic_change_in_inventories', '$C$92:$Q$107'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#  ['historic_GFCF', '$C$38:$Q$53'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#  ['historic_goverment_expenditures', '$C$74:$Q$89'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#  ['historic_HD', '$C$56:$Q$71'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#  ['historic_labour_compensation', '$C$20:$V$35'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#
+#  ['historic_final_energy_intensity_electricity', '$C$111:$Q$127'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#  ['historic_final_energy_intensity_gases', '$C$162:$Q$178'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#  ['historic_final_energy_intensity_heat', '$C$128:$Q$144'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#  ['historic_final_energy_intensity_liquids', '$C$145:$Q$161'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#  ['historic_final_energy_intensity_solids', '$C$179:$Q$195'], #setting it as in OG economy file, that is to say all sectors from 1995 to 2009
+#
+#  ['historic_GDP', '$C$198:$V$198'],
+#
+#  ['historic_mean_rate_energy_intensity_electricity', '$AB$111:$AB$127'],
+#  ['historic_mean_rate_energy_intensity_gases', '$AB$162:$AB$178'],
+#  ['historic_mean_rate_energy_intensity_heat', '$AB$128:$AB$144'],
+#  ['historic_mean_rate_energy_intensity_liquids', '$AB$145:$AB$161'],
+#  ['historic_mean_rate_energy_intensity_solids', '$AB$179:$AB$195'],
+#
+#  ['input_GDPpc_annual_growth', '$C$200:$AL$200'], ['time_index_projection', '$C$199:$AL$199'], #this data be missin in my economy file
+#  ['time_index2009', '$C$1:$Q$1'], ['time_index2014', '$C$1:$V$1']
+#  ]
 
 #open economydata.xlsx, add defined names to World sheet and save
-os.chdir('/Users/Etguer/pymedeasQCdata/QC_IOT_data/medeasQC_input/QCinput2024')  # need to use '/' or '//' instead of '\'
-xlsxfile = 'economydata.xlsx'
-wb = openpyxl.load_workbook(xlsxfile)
-ws = wb['World']
-ws.title = 'World'
-for element in defnsWorld_List:
-    ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(element[1])}"
-    defn = DefinedName(element[0], attr_text = ref)
-    ws.defined_names.add(defn)
-
-wb.save('economydatadefname.xlsx')
+os.chdir('G:/Other computers/My iMac/medeasQC_input/QCinputMay2026')
+# #os.chdir('/Users/Etguer/pymedeasQCdata/QC_IOT_data/medeasQC_input/QCinput2024')  # need to use '/' or '//' instead of '\'
+# xlsxfile = 'economydata.xlsx'
+# wb = openpyxl.load_workbook(xlsxfile)
+# ws = wb['World']
+# ws.title = 'World'
+# for element in defnsWorld_List:
+#     ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(element[1])}"
+#     defn = DefinedName(element[0], attr_text = ref)
+#     ws.defined_names.add(defn)
+#
+# wb.save('economydatadefname.xlsx')
 
 #TO DO:
-# defined names for Quebec sheet
+# defined names for Quebec sheetTO
 #GDP growth rates change header from 1995-... to from 2015 (?) - 2050 as in economyOG.xlsx
 #when I run pymedeas2 there is a defined names bug - even with original catalonia model, so this might have to do with my installed version of openpyxl? or I dunno
 

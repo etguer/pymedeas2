@@ -1,10 +1,128 @@
 
 import openpyxl
+import os.path
 
-wb = openpyxl.load_workbook("./16sec_qc_data_code/original_and_mock_xlsx/14sec_original_data/economy.xlsx")
+os.chdir('C:/Users/thinkpad/PycharmProjects/pymedeas2qc/')
+wb = openpyxl.load_workbook("./pymedeas2/16sec_qc_data_code/original_and_mock_xlsx/14sec_original_data/economy.xlsx")
 
 ws = wb['World']
 
 for key in ws.defined_names:
     print(key)
+
+['Capital Compensation', 'Labour Compensation', 'Gross Fixed Capital Formation', 'Households demand',
+ 'Government expenditures', 'Change in inventories', 'Final demand RoW', 'Exports of FINALS GOODS to RoW']
+
+
+
+beta_0_GFCF
+beta_0_HD
+beta_1_GFCF
+beta_1_HD
+historic_A_Matrix_year1995
+historic_A_Matrix_year1996
+historic_A_Matrix_year1997
+historic_A_Matrix_year1998
+historic_A_Matrix_year1999
+historic_A_Matrix_year2000
+historic_A_Matrix_year2001
+historic_A_Matrix_year2002
+historic_A_Matrix_year2003
+historic_A_Matrix_year2004
+historic_A_Matrix_year2005
+historic_A_Matrix_year2006
+historic_A_Matrix_year2007
+historic_A_Matrix_year2008
+historic_A_Matrix_year2009
+historic_A_Matrix_year2010
+historic_A_Matrix_year2011
+historic_A_Matrix_year2012
+historic_A_Matrix_year2013
+historic_A_Matrix_year2014
+#historic_capital_compensation
+#historic_change_in_inventories
+historic_final_energy_intensity_electricity
+historic_final_energy_intensity_gases
+historic_final_energy_intensity_heat
+historic_final_energy_intensity_liquids
+historic_final_energy_intensity_solids
+historic_GDP
+#historic_GFCF
+#historic_goverment_expenditures
+#historic_HD
+#historic_labour_compensation
+historic_mean_rate_energy_intensity_electricity
+historic_mean_rate_energy_intensity_gases
+historic_mean_rate_energy_intensity_heat
+historic_mean_rate_energy_intensity_liquids
+historic_mean_rate_energy_intensity_solids
+input_GDPpc_annual_growth
+time_index_projection
+
+
+
+
+
+
+
+ws = wb['Europe']
+
+for key in ws.defined_names:
+    print(key)
+
+
+
+['historic_capital_compensation', 'historic_labour_compensation', 'historic_GFCF', 'historic_HD',
+ 'historic_government_expenditures', 'historic_change_in_inventories', 'historic_demand_RoW', 'historic_exports_demand']
+
+beta_0_EXP
+beta_0_GFCF
+beta_0_HD
+beta_1_EXP
+beta_1_GFCF
+beta_1_HD
+historic_A_Matrix_year1995
+historic_A_Matrix_year1996
+historic_A_Matrix_year1997
+historic_A_Matrix_year1998
+historic_A_Matrix_year1999
+historic_A_Matrix_year2000
+historic_A_Matrix_year2001
+historic_A_Matrix_year2002
+historic_A_Matrix_year2003
+historic_A_Matrix_year2004
+historic_A_Matrix_year2005
+historic_A_Matrix_year2006
+historic_A_Matrix_year2007
+historic_A_Matrix_year2008
+historic_A_Matrix_year2009
+historic_A_Matrix_year2010
+historic_A_Matrix_year2011
+historic_A_Matrix_year2012
+historic_A_Matrix_year2013
+historic_A_Matrix_year2014
+historic_capital_compensation
+#historic_change_in_inventories
+#historic_demand_RoW
+#historic_exports_demand
+historic_final_energy_intensity_electricity
+historic_final_energy_intensity_gases
+historic_final_energy_intensity_heat
+historic_final_energy_intensity_liquids
+historic_final_energy_intensity_solids
+historic_GDP
+#historic_GFCF
+#historic_goverment_expenditures
+#historic_HD
+#historic_labour_compensation
+historic_mean_rate_energy_intensity_electricity
+historic_mean_rate_energy_intensity_gases
+historic_mean_rate_energy_intensity_heat
+historic_mean_rate_energy_intensity_liquids
+historic_mean_rate_energy_intensity_solids
+input_GDPpc_annual_growth
+time_index_2009
+time_index_projection
+time_index2009
+time_index2014
 
