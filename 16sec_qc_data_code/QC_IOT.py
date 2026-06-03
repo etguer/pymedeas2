@@ -28,24 +28,26 @@ from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.utils import quote_sheetname, absolute_coordinate, get_column_letter
 
 
-def written_range(df: pd.DataFrame, startrow, startcol, header=True, index=True):
+def written_range(df: pd.DataFrame, startrow, startcol, header=True, index=True, ncols_limit=None):
     """Return the A1 range that df.to_excel(...) writes for the given start cell.
 
     startrow/startcol are 0-indexed (as pandas to_excel expects).
-    data_only=True returns just the data cells (excludes header rows and index cols).
+    ncols_limit: if given, cap the named range to this many data columns (used to
+                 stop time-series named ranges at the correct year rather than 2018).
     """
     h = df.columns.nlevels if header else 0
     i = df.index.nlevels if index else 0
 
-    top_row = startrow + 1 + h 
-    left_col = startcol + 1 + i 
+    top_row = startrow + 1 + h
+    left_col = startcol + 1 + i
     bot_row = startrow + h + len(df)
-    right_col = startcol + i + len(df.columns)
+    ncols = ncols_limit if ncols_limit is not None else len(df.columns)
+    right_col = startcol + i + ncols
 
     return f"{get_column_letter(left_col)}{top_row}:{get_column_letter(right_col)}{bot_row}"
 
-def add_defined_name_section(writer, sheetname, name, data, startrow, startcol,header=True, index=True):
-    rng = written_range(data, startrow, startcol, header=header, index=index)
+def add_defined_name_section(writer, sheetname, name, data, startrow, startcol, header=True, index=True, ncols_limit=None):
+    rng = written_range(data, startrow, startcol, header=header, index=index, ncols_limit=ncols_limit)
     ws = writer.sheets[sheetname]
     ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(rng)}"
     ws.defined_names.add(DefinedName(name, attr_text=ref))
@@ -1994,7 +1996,7 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
             startrow=startrow,
             startcol=startcol
         )
-        add_defined_name_section(writer, sheetname, OutputQCIndexListDefNames[i], data, startrow, startcol, header=True, index=True)
+        add_defined_name_section(writer, sheetname, OutputQCIndexListDefNames[i], data, startrow, startcol, header=True, index=True, ncols_limit=20)
 # WRITE World econometric variables (CC, LC, GFCF, ..., INV)
     for i in range(len(OutputWorldIndexListNames)):
         data = pd.DataFrame(
@@ -2014,7 +2016,7 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
             startrow=startrow,
             startcol=startcol
         )
-        add_defined_name_section(writer, sheetname, OutputWorldIndexListDefNames[i], data, startrow, startcol, header=True, index=True)
+        add_defined_name_section(writer, sheetname, OutputWorldIndexListDefNames[i], data, startrow, startcol, header=True, index=True, ncols_limit=20)
 
 
 
@@ -2022,11 +2024,11 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
     # QC
     data = pd.DataFrame(data=EI_QCArray, index=EIindex, columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=True, startrow=145-1, startcol=1-1)
-    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_electricity", data.xs('ELEC',level=1), startrow=145 - 1, startcol=1, header=True, index=True)
-    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_heat", data.xs('HEAT',level=1), startrow=145 - 1+17, startcol=1, header=True, index=True)
-    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_liquids", data.xs('LIQUIDS',level=1), startrow=145 - 1+17*2, startcol=1 , header=True, index=True)
-    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_gases", data.xs('GAS',level=1), startrow=145 - 1+17*3, startcol=1, header=True, index=True)
-    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_solids", data.xs('SOLIDS',level=1), startrow=145 - 1+17*4, startcol=1, header=True, index=True)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_electricity", data.xs('ELEC',level=1), startrow=145 - 1, startcol=1, header=True, index=True, ncols_limit=20)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_heat", data.xs('HEAT',level=1), startrow=145 - 1+17, startcol=1, header=True, index=True, ncols_limit=20)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_liquids", data.xs('LIQUIDS',level=1), startrow=145 - 1+17*2, startcol=1 , header=True, index=True, ncols_limit=20)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_gases", data.xs('GAS',level=1), startrow=145 - 1+17*3, startcol=1, header=True, index=True, ncols_limit=20)
+    add_defined_name_section(writer, 'Quebec', "historic_final_energy_intensity_solids", data.xs('SOLIDS',level=1), startrow=145 - 1+17*4, startcol=1, header=True, index=True, ncols_limit=20)
 
     #WORLD
     data = pd.DataFrame(
@@ -2035,16 +2037,16 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
         columns=yearsColumns
     )
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=True, startrow=110-1, startcol=1-1)
-    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_electricity", data.xs('ELEC',level=1), startrow=110 - 1, startcol=1, header=True, index=True)
-    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_heat", data.xs('HEAT',level=1), startrow=110 - 1+17, startcol=1, header=True, index=True)
-    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_liquids", data.xs('LIQUIDS',level=1), startrow=110 - 1+17*2, startcol=1 , header=True, index=True)
-    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_gases", data.xs('GAS',level=1), startrow=110 - 1+17*3, startcol=1, header=True, index=True)
-    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_solids", data.xs('SOLIDS',level=1), startrow=110 - 1+17*4, startcol=1, header=True, index=True)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_electricity", data.xs('ELEC',level=1), startrow=110 - 1, startcol=1, header=True, index=True, ncols_limit=20)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_heat", data.xs('HEAT',level=1), startrow=110 - 1+17, startcol=1, header=True, index=True, ncols_limit=20)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_liquids", data.xs('LIQUIDS',level=1), startrow=110 - 1+17*2, startcol=1 , header=True, index=True, ncols_limit=20)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_gases", data.xs('GAS',level=1), startrow=110 - 1+17*3, startcol=1, header=True, index=True, ncols_limit=20)
+    add_defined_name_section(writer, 'World', "historic_final_energy_intensity_solids", data.xs('SOLIDS',level=1), startrow=110 - 1+17*4, startcol=1, header=True, index=True, ncols_limit=20)
 #GDP for both
     #QC
     data = pd.DataFrame(data=GDPArrayMedeasFormat, columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=False, startrow=233-1, startcol=3-1)
-    add_defined_name_section(writer, 'Quebec', "historic_GDP", data, 233 - 1, 3-1, header=False, index=False)
+    add_defined_name_section(writer, 'Quebec', "historic_GDP", data, 233 - 1, 3-1, header=False, index=False, ncols_limit=20)
 
     data = pd.DataFrame(data=None, columns=['historic GDP', '(M$)'])
     data.to_excel(writer, sheet_name='Quebec', index=False, header=True, startrow=233-1,startcol=1-1)
@@ -2052,7 +2054,7 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
     #World
     data = pd.DataFrame(data=GDPwArrayMedeasFormat, columns=yearsColumns)
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=False, startrow=197-1, startcol=3-1)
-    add_defined_name_section(writer, 'World', "historic_GDP", data, 197-1, 3-1, header=False, index=False)
+    add_defined_name_section(writer, 'World', "historic_GDP", data, 197-1, 3-1, header=False, index=False, ncols_limit=20)
 
     data = pd.DataFrame(data=None, columns=['historic GDP', '(M$)'])
     data.to_excel(writer, sheet_name='World', header=True, index=False, startrow=197 - 1, startcol=1 - 1)
@@ -2060,7 +2062,7 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
     #QC
     data = pd.DataFrame(data=np.full(fill_value=np.nan, shape=(1,24)), columns=yearsColumns)
     data.to_excel(writer, sheet_name='Quebec', na_rep='na', header=True, index=False, startrow=235 - 1, startcol=3 - 1)
-    add_defined_name_section(writer, 'Quebec', "input_GDPpc_annual_growth", data, 235-1, 3-1, header=False, index=False)
+    add_defined_name_section(writer, 'Quebec', "input_GDPpc_annual_growth", data, 235-1, 3-1, header=False, index=False, ncols_limit=20)
     
     data = pd.DataFrame(data=None, columns=['GDPpc projection growth', '(Dmnl)'])
     data.to_excel(writer, sheet_name='Quebec', header=True, index=False, startrow=235 - 1, startcol=1 - 1)
@@ -2068,7 +2070,7 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
     #World
     data = pd.DataFrame(data=np.full(fill_value=np.nan, shape=(1, 24)), columns=yearsColumns)
     data.to_excel(writer, sheet_name='World', na_rep='na', header=True, index=False, startrow=199 - 1, startcol=3 - 1)
-    add_defined_name_section(writer, 'World', "input_GDPpc_annual_growth", data, 199-1, 3-1, header=False, index=False)
+    add_defined_name_section(writer, 'World', "input_GDPpc_annual_growth", data, 199-1, 3-1, header=False, index=False, ncols_limit=20)
 
     data = pd.DataFrame(data=None, columns=['GDPpc projection growth', '(Dmnl)'])
     data.to_excel(writer, sheet_name='World', header=True, index=False, startrow=199 - 1, startcol=1 - 1)
@@ -2221,7 +2223,7 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
                              _ge_data,
                              startrow=OutputWorldExcelLocationList[4][0] - 1,
                              startcol=OutputWorldExcelLocationList[4][1] - 1,
-                             header=True, index=True)
+                             header=True, index=True, ncols_limit=20)
     _ge_qc_data = pd.DataFrame(
         data=np.append(csEmptyYearsArray, OutputQCValuesList[4], axis=1),
         columns=yearsColumns,
@@ -2231,7 +2233,7 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
                              _ge_qc_data,
                              startrow=OutputQuebecExcelLocationList[4][0] - 1,
                              startcol=OutputQuebecExcelLocationList[4][1] - 1,
-                             header=True, index=True)
+                             header=True, index=True, ncols_limit=20)
 
 #TO DO: clean up code to make it elegant and organized
 
