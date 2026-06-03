@@ -2153,6 +2153,83 @@ with pd.ExcelWriter(path+filename, engine='openpyxl') as writer:
             add_defined_name_section(writer, coeffSheetNames[i], 'historic_mean_rate_energy_intensity_solids', data.loc[['SOLIDS']],
                                     startrow=coeffExcelLocation[i][0] - 1 - 1 + 17*4, startcol=coeffExcelLocation[i][1] - 1, header=True, index=False)
 
+    # [Added for 16-sector compatibility - 2026-06]
+    # Create Global sheet with transport_fraction and inland_transport_fraction.
+    # Mirrors the 14-sector Global sheet structure but for 16 sectors.
+    # transport_fraction        : 1.0 for Transport sector, 0 for all others.
+    # inland_transport_fraction : 0.4 for Transport sector, 0 for all others
+    #                             (same value as for Transport_storage_and_communication in 14-sector).
+    # Layout (matching 14-sector convention):
+    #   Row 1 (header): sector names in cols B-Q
+    #   Row 2: inland transport fraction values in cols B-Q  ->  named range inland_transport_fraction
+    #   Row 3: transport fraction values in cols B-Q         ->  named range transport_fraction
+    _transport_fractions = [1.0 if s == 'Transport' else 0.0 for s in csString]
+    _inland_fractions    = [0.4 if s == 'Transport' else 0.0 for s in csString]
+    _df_global = pd.DataFrame(
+        data=[_inland_fractions, _transport_fractions],
+        index=['inland transport fraction', 'transport fraction'],
+        columns=csString,
+    )
+    _df_global.to_excel(writer, sheet_name='Global', header=True, index=True,
+                        startrow=0, startcol=0)
+    # Named ranges cover the data cells only (no row label in col A, no header row).
+    # inland: startrow=1 → Excel row 2; transport: startrow=2 → Excel row 3; both cols B-Q.
+    add_defined_name_section(writer, 'Global', 'inland_transport_fraction',
+                             pd.DataFrame([_inland_fractions], columns=csString),
+                             startrow=1, startcol=1, header=False, index=False)
+    add_defined_name_section(writer, 'Global', 'transport_fraction',
+                             pd.DataFrame([_transport_fractions], columns=csString),
+                             startrow=2, startcol=1, header=False, index=False)
+
+    # [Added for 16-sector compatibility - 2026-06]
+    # Add time index named ranges required by pymedeas_w (World sheet) and pymedeas_qc
+    # (Quebec sheet, accessed internally as 'Europe') that were not yet generated.
+    #
+    # Year header layout: MultiIndex occupies cols A-B; year data starts at col C (col 3).
+    # QC data covers 1995-2018 (24 years) -> cols C(3)..Z(26).
+    # All time indices span the full 24-year data range so pysd dimension lengths match.
+    # The names (time_index2009, time_index2014) follow the 14-sector convention but
+    # cover the full 24 years here to match the actual data width.
+    #   time_index2009 / time_index2014 / time_index_2009 : C..Z (cols 3..26)
+    #   time_index_projection (World row 199 / Quebec row 235) : header of input_GDPpc_annual_growth
+    def _add_time_index(ws, name, row, col_start, col_end):
+        ref = (f"{quote_sheetname(ws.title)}!"
+               f"${get_column_letter(col_start)}${row}:"
+               f"${get_column_letter(col_end)}${row}")
+        ws.defined_names.add(DefinedName(name, attr_text=ref))
+
+    _add_time_index(writer.sheets['World'],  'time_index2009',        row=1,   col_start=3, col_end=26)
+    _add_time_index(writer.sheets['World'],  'time_index2014',        row=1,   col_start=3, col_end=26)
+    _add_time_index(writer.sheets['World'],  'time_index_projection', row=199, col_start=3, col_end=26)
+    _add_time_index(writer.sheets['Quebec'], 'time_index_2009',       row=1,   col_start=3, col_end=26)
+    _add_time_index(writer.sheets['Quebec'], 'time_index2009',        row=1,   col_start=3, col_end=26)
+    _add_time_index(writer.sheets['Quebec'], 'time_index2014',        row=1,   col_start=3, col_end=26)
+    _add_time_index(writer.sheets['Quebec'], 'time_index_projection', row=235, col_start=3, col_end=26)
+
+    # Typo alias required by pymedeas model code: 'historic_goverment_expenditures' (missing 'n').
+    # The 16-sector data uses the correct spelling; add aliases pointing to the same data cells.
+    # Uses add_defined_name_section with the GE DataFrame (index 4) to get the exact cell range.
+    _ge_data = pd.DataFrame(
+        data=np.append(csEmptyYearsArray, OutputWorldValuesList[4], axis=1),
+        columns=yearsColumns,
+        index=OutputWorldIndexList[4],
+    )
+    add_defined_name_section(writer, 'World', 'historic_goverment_expenditures',
+                             _ge_data,
+                             startrow=OutputWorldExcelLocationList[4][0] - 1,
+                             startcol=OutputWorldExcelLocationList[4][1] - 1,
+                             header=True, index=True)
+    _ge_qc_data = pd.DataFrame(
+        data=np.append(csEmptyYearsArray, OutputQCValuesList[4], axis=1),
+        columns=yearsColumns,
+        index=OutputQCIndexList[4],
+    )
+    add_defined_name_section(writer, 'Quebec', 'historic_goverment_expenditures',
+                             _ge_qc_data,
+                             startrow=OutputQuebecExcelLocationList[4][0] - 1,
+                             startcol=OutputQuebecExcelLocationList[4][1] - 1,
+                             header=True, index=True)
+
 #TO DO: clean up code to make it elegant and organized
 
 # might need to change engine to xlsxwriter (instead of openpyxl),

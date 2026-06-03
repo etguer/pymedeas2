@@ -152,10 +152,20 @@ _ext_constant_target_year_process_emissions_improvement = ExtConstant(
         "process_emissions_intensity": 1,
     },
 )
+# [Added for 16-sector compatibility - 2026-06]
+_SECTORS_16_PE = "Agriculture_Forestry" in _subscript_dict.get("SECTORS_and_HOUSEHOLDS", [])
+
+
 def total_process_emissions():
     """
     Total emissions comming from industrial processes
     """
+    # [Added for 16-sector compatibility - 2026-06]
+    if _SECTORS_16_PE:
+        # 16-sector: Coke_refined_petroleum_nuclear_fuel_and_chemicals_etc has no equivalent
+        # in the 16-sector classification; process emissions calculation commented out.
+        # Returns 0 for 16-sector runs.
+        return 0
     return (
         float(
             total_output_required_by_sector().loc[

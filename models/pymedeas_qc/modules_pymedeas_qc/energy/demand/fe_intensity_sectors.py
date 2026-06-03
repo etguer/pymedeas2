@@ -3,6 +3,10 @@ Module energy.demand.fe_intensity_sectors
 Translated using PySD version 3.14.2
 """
 
+# [Added for 16-sector compatibility - 2026-06]
+_SECTORS_16_FE = "Agriculture_Forestry" in _subscript_dict.get("SECTORS_and_HOUSEHOLDS", [])
+
+
 @component.add(
     name="Activate_BOTTOM_UP_method",
     units="Dmnl",
@@ -20,11 +24,20 @@ def activate_bottom_up_method():
         ["SECTORS_and_HOUSEHOLDS"],
     )
     except_subs = xr.ones_like(value, dtype=bool)
-    except_subs.loc[["Transport_storage_and_communication"]] = False
-    except_subs.loc[["Households"]] = False
-    value.values[except_subs.values] = 0
-    value.loc[["Transport_storage_and_communication"]] = 0
-    value.loc[["Households"]] = 0
+    # [Added for 16-sector compatibility - 2026-06]
+    if _SECTORS_16_FE:
+        # 16-sector: Transport_storage_and_communication has no equivalent in the 16-sector
+        # classification; bottom-up activation for transport commented out.
+        # All sectors (including Households) use top-down method.
+        except_subs.loc[["Households"]] = False
+        value.values[except_subs.values] = 0
+        value.loc[["Households"]] = 0
+    else:
+        except_subs.loc[["Transport_storage_and_communication"]] = False
+        except_subs.loc[["Households"]] = False
+        value.values[except_subs.values] = 0
+        value.loc[["Transport_storage_and_communication"]] = 0
+        value.loc[["Households"]] = 0
     return value
 
 
