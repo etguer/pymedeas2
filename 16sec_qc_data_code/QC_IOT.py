@@ -1916,11 +1916,14 @@ GDPEmptyYearsArray = np.full(fill_value = np.nan, shape = (1, len(np.arange(1995
 GDPArrayMedeasFormat = np.concatenate((GDPEmptyYearsArray, GDPArray), axis = 1)
 GDPwArrayMedeasFormat = np.concatenate((GDPEmptyYearsArray, GDPwArray), axis = 1)
 #empty arrays for 1995-2003 / 2015-2018 years for A matrices
+# [Added for 16-sector compatibility - 2026-06]
+# Backfill 1995-2003 with 2004 values (first available year) instead of NaN,
+# so the model can initialise its stateful variables correctly when starting from 1995.
 #QC
-A4emptyYearsArray1 = np.full(fill_value = np.nan, shape = np.concatenate((A4[:,:,0].shape,[len(np.arange(1995,2004))])))
+A4emptyYearsArray1 = np.repeat(A4[:,:,[0]], len(np.arange(1995,2004)), axis=2)
 A4emptyYearsArray2 = np.full(fill_value = np.nan, shape = np.concatenate((A4[:,:,0].shape,[len(np.arange(2014,2018))])))
 #World
-A_ICwEmptyYearsArray1 = np.full(fill_value = np.nan, shape = np.concatenate((A_ICw[:,:,0].shape,[len(np.arange(1995,2004))])))
+A_ICwEmptyYearsArray1 = np.repeat(A_ICw[:,:,[0]], len(np.arange(1995,2004)), axis=2)
 A_ICwEmptyYearsArray2 = np.full(fill_value = np.nan, shape = np.concatenate((A_ICw[:,:,0].shape,[len(np.arange(2014,2018))])))
 #concatenate into single arrays
 A4medeasFormat = np.concatenate((A4emptyYearsArray1,A4,A4emptyYearsArray2), axis=2)

@@ -472,7 +472,7 @@ def historic_final_energy_intensity(x, final_subs=None):
 _ext_lookup_historic_final_energy_intensity = ExtLookup(
     r"../economy.xlsx",
     "World",
-    "time_index2009",
+    "time_index2014",
     "historic_final_energy_intensity_electricity",
     {
         "final_sources": ["electricity"],
@@ -489,7 +489,7 @@ _ext_lookup_historic_final_energy_intensity = ExtLookup(
 _ext_lookup_historic_final_energy_intensity.add(
     r"../economy.xlsx",
     "World",
-    "time_index2009",
+    "time_index2014",
     "historic_final_energy_intensity_heat",
     {
         "final_sources": ["heat"],
@@ -500,7 +500,7 @@ _ext_lookup_historic_final_energy_intensity.add(
 _ext_lookup_historic_final_energy_intensity.add(
     r"../economy.xlsx",
     "World",
-    "time_index2009",
+    "time_index2014",
     "historic_final_energy_intensity_liquids",
     {
         "final_sources": ["liquids"],
@@ -511,7 +511,7 @@ _ext_lookup_historic_final_energy_intensity.add(
 _ext_lookup_historic_final_energy_intensity.add(
     r"../economy.xlsx",
     "World",
-    "time_index2009",
+    "time_index2014",
     "historic_final_energy_intensity_gases",
     {
         "final_sources": ["gases"],
@@ -522,7 +522,7 @@ _ext_lookup_historic_final_energy_intensity.add(
 _ext_lookup_historic_final_energy_intensity.add(
     r"../economy.xlsx",
     "World",
-    "time_index2009",
+    "time_index2014",
     "historic_final_energy_intensity_solids",
     {
         "final_sources": ["solids"],
