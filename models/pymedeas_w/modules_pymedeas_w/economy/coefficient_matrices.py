@@ -274,9 +274,9 @@ def historic_ia_matrix():
     comp_subtype="Normal",
     depends_on={"historic_ia_matrix": 1},
 )
+
 def historic_leontief_matrix():
     return invert_matrix(historic_ia_matrix())
-
 
 @component.add(
     name="I_Matrix",

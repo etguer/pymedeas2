@@ -1189,7 +1189,7 @@ def inertial_rate_energy_intensity_top_down():
 )
 def initial_energy_intensity_1995():
     """
-    Initial energy intensity by sector and fuel in 1995
+   Initial energy intensity by sector and fuel in 1995
     """
     return (historic_final_energy_intensity(1995) * mdollar_per_tdollar()).transpose(
         "SECTORS_and_HOUSEHOLDS", "final_sources"

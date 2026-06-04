@@ -134,16 +134,25 @@ def fes_heat_from_oil():
     },
 )
 def fes_nre_for_heat():
-    """
-    Heat from non-renewable energy resources.
-    """
-    return (
-        fes_heatcom_fossil_fuels_chp_plants_ej()
-        + fes_heat_from_coal()
-        + fes_heat_from_nat_gas()
-        + fes_heat_from_oil()
-        + fes_heatcom_nuclear_chp_plants_ej()
-    )
+#TEST
+    a = fes_heatcom_fossil_fuels_chp_plants_ej()
+    b = fes_heat_from_coal()
+    c = fes_heat_from_nat_gas()
+    d = fes_heat_from_oil()
+    e = fes_heatcom_nuclear_chp_plants_ej()
+    print(f"[DIAG] fes_nre_for_heat: chp_ff={a}, coal={b}, gas={c}, oil={d}, nuclear={e}")
+    return a + b + c + d + e
+#TEST
+#    """
+#    Heat from non-renewable energy resources.
+#    """
+#    return (
+#        fes_heatcom_fossil_fuels_chp_plants_ej()
+#        + fes_heat_from_coal()
+#        + fes_heat_from_nat_gas()
+#        + fes_heat_from_oil()
+#        + fes_heatcom_nuclear_chp_plants_ej()
+#    )
 
 
 @component.add(
@@ -187,14 +196,21 @@ _delayfixed_fes_res_for_heat_delayed_1yr = DelayFixed(
     },
 )
 def fes_res_for_heat_ej():
-    """
-    Heat from renewable energy sources.
-    """
-    return (
-        fe_real_supply_res_for_heatcom_tot()
-        + fe_real_supply_res_for_heatnc_tot_ej()
-        + fes_heatcom_from_biogas_ej()
-    )
+#TEST
+    a = fe_real_supply_res_for_heatcom_tot()
+    b = fe_real_supply_res_for_heatnc_tot_ej()
+    c = fes_heatcom_from_biogas_ej()
+    print(f"[DIAG] fes_res_for_heat: heatcom={a}, heatnc={b}, biogas={c}")
+    return a + b + c
+#TEST
+#    """
+#    Heat from renewable energy sources.
+#    """
+#    return (
+#        fe_real_supply_res_for_heatcom_tot()
+#        + fe_real_supply_res_for_heatnc_tot_ej()
+#        + fes_heatcom_from_biogas_ej()
+#    )
 
 
 @component.add(
@@ -311,10 +327,17 @@ def share_res_heat_generation():
     },
 )
 def total_fe_heat_generation():
-    """
-    Total final heat generation (fossil fuels, nuclear, waste & renewables) (EJ).
-    """
-    return fes_res_for_heat_ej() + fes_heatcom_from_waste_ej() + fes_nre_for_heat()
+#TEST
+    a = fes_res_for_heat_ej()
+    b = fes_heatcom_from_waste_ej()
+    c = fes_nre_for_heat()
+    print(f"[DIAG] total_fe_heat_gen: res={a}, waste={b}, nre={c}")
+    return a + b + c
+#TEST
+#    """
+#    Total final heat generation (fossil fuels, nuclear, waste & renewables) (EJ).
+#    """
+#    return fes_res_for_heat_ej() + fes_heatcom_from_waste_ej() + fes_nre_for_heat()
 
 
 @component.add(

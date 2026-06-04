@@ -48,4 +48,5 @@ if __name__ == "__main__":
     # create results directory if it does not exist
     Path(config.model.out_folder).mkdir(parents=True, exist_ok=True)
 
+
     run(config, model)

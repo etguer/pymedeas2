@@ -331,7 +331,13 @@ def real_fec_before_heat_dem_corr():
     value.loc[["solids"]] = float(real_fe_consumption_by_fuel().loc["solids"]) / (
         1 - float(share_feh_over_fed_by_final_fuel().loc["solids"])
     )
-    return value
+    # TEST
+    result = value
+    print(f"[DIAG] real_fec_before_heat_dem_corr:\n{result}")
+    return result
+    # TEST
+
+ #   return value
 
 
 @component.add(
@@ -352,6 +358,10 @@ def real_final_energy_by_sector_and_fuel():
     """
     Real final energy to be used by economic sectors and fuel after accounting for energy scarcity and CC impacts.
     """
+    #TEST
+    _esc = energy_scarcity_feedback_shortage_coeff()
+    print(f"[DIAG] energy_scarcity_feedback_shortage_coeff:\n{_esc}")
+    #TEST
     value = xr.DataArray(
         np.nan,
         {
@@ -400,7 +410,14 @@ def real_final_energy_by_sector_and_fuel():
         .expand_dims({"dac_final_sources": ["heat"]}, 0)
         .values
     )
+
+    # TEST
+    print(f"[DIAG] real_final_energy_by_sector_and_fuel:\n{value}")
     return value
+    # TEST
+
+
+#    return value
 
 
 @component.add(
@@ -675,7 +692,12 @@ def required_final_energy_by_sector_and_fuel():
         .expand_dims({"dac_final_sources": ["heat"]}, 0)
         .values
     )
+
+    # TEST
+    print(f"[DIAG] required_final_energy_by_sector_and_fuel:\n{value}")
     return value
+    # TEST
+ #   return value
 
 
 @component.add(

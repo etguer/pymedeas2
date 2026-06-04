@@ -297,6 +297,8 @@ def gdp_growth():
     """
     Growth of GDP each time step
     """
+
+    _gdp = gdp()
     return (gdp() - gdp_delayed_time_step()) / gdp()
 
 

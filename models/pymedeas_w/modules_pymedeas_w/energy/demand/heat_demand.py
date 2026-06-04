@@ -29,9 +29,15 @@ def fe_heat_demand_consum():
     },
 )
 def fed_heatcom_after_priorities():
-    """
-    Total commercial heat demand including distribution losses after technologies with priority in the mix (waste and biogas).
-    """
+    # TEST
+    a = total_fed_heatcom_ej()
+    b = fes_heatcom_from_waste_ej()
+    c = fes_heatcom_from_biogas_ej()
+    print(f"[DIAG] "
+    f"fed_heatcom_after_priorities: "
+    f"total_fed_heatcom_ej={a}, "
+    f"fes_heatcom_from_waste={b}, "
+    f"fes_heatcom_from_biogas_ej={c}")
     return float(
         np.maximum(
             0,
@@ -40,6 +46,19 @@ def fed_heatcom_after_priorities():
             - fes_heatcom_from_biogas_ej(),
         )
     )
+    # TEST
+
+#    """
+#    Total commercial heat demand including distribution losses after technologies with priority in the mix (waste and biogas).
+#    """
+#    return float(
+#        np.maximum(
+#            0,
+#            total_fed_heatcom_ej()
+#            - fes_heatcom_from_waste_ej()
+#            - fes_heatcom_from_biogas_ej(),
+#        )
+#    )
 
 
 @component.add(

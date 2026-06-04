@@ -272,6 +272,8 @@ def historic_ia_matrix():
     depends_on={"historic_ia_matrix": 1},
 )
 def historic_leontief_matrix():
+
+
     return invert_matrix(historic_ia_matrix())
 
 
