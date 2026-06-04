@@ -264,6 +264,18 @@ def c_in_atmosphere():
     """
     Carbon in atmosphere.
     """
+    #TEST
+    result = _integ_c_in_atmosphere()
+    print(f"[DIAG] c_in_atmosphere\n{result}")
+    print(f"[DIAG] c_from_ch4_oxidation()\n{c_from_ch4_oxidation}")
+    print(f"[DIAG] flux_biomass_to_atmosphere\n{flux_biomass_to_atmosphere()}")
+    print(f"[DIAG] flux_humus_to_atmosphere\n{flux_humus_to_atmosphere()}")
+ #   print(f"[DIAG] total_c_anthro_emissions\n{total_c_anthro_emissions()}")
+ #   print(f"[DIAG] flux_atm_to_biomass\n{flux_atm_to_biomass()}")
+ #   print(f"[DIAG] flux_atm_to_ocean\n{flux_atm_to_ocean()}")
+ #   print(f"[DIAG] flux_c_from_permafrost_release\n{flux_c_from_permafrost_release()}")
+ #   print(f"[DIAG] init_c_in_atm()\n{init_c_in_atm()}")
+    #TEST
     return _integ_c_in_atmosphere()
 
 
@@ -1487,6 +1499,10 @@ _ext_constant_strength_of_temp_effect_on_land_c_flux_mean = ExtConstant(
     depends_on={"total_co2_emissions_gtco2_after_capture": 1, "gtc_per_gtco2": 1},
 )
 def total_c_anthro_emissions():
+    # TEST
+    result = total_co2_emissions_gtco2_after_capture()
+    print(f"[DIAG] total_co2_emissions_gtco2_after_capture:\n{result}")
+    # TEST
     """
     Total annual CO2 emissions converted to GtC/year.
     """

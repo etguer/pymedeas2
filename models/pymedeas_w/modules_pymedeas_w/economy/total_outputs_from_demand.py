@@ -555,10 +555,16 @@ def required_fed_by_fuel():
     depends_on={"required_fed_sectors_by_fuel": 1, "households_final_energy_demand": 1},
 )
 def required_fed_by_fuel_before_heat_correction():
-    """
-    Required final energy demand by fuel before heat demand correction. The final energy demand is modified with the feedback from the change of the EROEI.
-    """
-    return required_fed_sectors_by_fuel() + households_final_energy_demand()
+    # TEST
+    result = required_fed_sectors_by_fuel() + households_final_energy_demand()
+    print(f"[DIAG] required_fed_by_fuel_before_heat_correction\n{result}")
+    return result
+    # TEST
+
+#    """
+#    Required final energy demand by fuel before heat demand correction. The final energy demand is modified with the feedback from the change of the EROEI.
+#    """
+#    return required_fed_sectors_by_fuel() + households_final_energy_demand()
 
 
 @component.add(
@@ -603,13 +609,25 @@ def required_fed_by_sector():
     },
 )
 def required_fed_sectors_by_fuel():
-    return (
-        sum(
-            required_final_energy_by_sector_and_fuel().rename({"sectors": "sectors!"}),
-            dim=["sectors!"],
-        )
-        * cc_impacts_feedback_shortage_coeff()
+# TEST
+    result =       (sum(
+    required_final_energy_by_sector_and_fuel().rename({"sectors": "sectors!"}),
+    dim=["sectors!"],
     )
+    * cc_impacts_feedback_shortage_coeff())
+    print(f"[DIAG] required_final_energy_by_sector_and_fuel:\n{required_final_energy_by_sector_and_fuel()}")
+    print(f"[DIAG] cc_impacts_feedback_shortage_coeff:\n{cc_impacts_feedback_shortage_coeff()}")
+    print(f"[DIAG] required_fed_sector_by_fuel:\n{result}")
+    return result
+# TEST
+
+#    return (
+#        sum(
+#            required_final_energy_by_sector_and_fuel().rename({"sectors": "sectors!"}),
+#            dim=["sectors!"],
+#        )
+#        * cc_impacts_feedback_shortage_coeff()
+#    )
 
 
 @component.add(

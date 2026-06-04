@@ -91,6 +91,14 @@ _ext_constant_b_logistic = ExtConstant(
     },
 )
 def elf():
+    # TEST
+    a = co2_ppm_concentrations()
+    b = a_logistic()
+    c = b_logistic()
+    print(f"[DIAG] co2_ppm_concentrations:\n{a}")
+    print(f"[DIAG] a_logistic:\n{b}")
+    print(f"[DIAG] b_logistic:\n{c}")
+    # TEST
     return if_then_else(
         activate_elf(),
         lambda: 1
@@ -127,6 +135,13 @@ _sampleiftrue_elf_2015 = SampleIfTrue(
     depends_on={"elf": 1, "elf_2015": 1},
 )
 def share_e_losses_cc():
+    # TEST
+    result = elf() - elf_2015()
+    print(f"[DIAG] share_e_losses_cc:\n{result}")
+    print(f"[DIAG] elf:\n{elf()}")
+    print(f"[DIAG] elf_2015:\n{elf_2015()}")
+    return result
+    # TEST
     """
     Share of energy losses in relation to TFED due to climate change impacts.
     """
